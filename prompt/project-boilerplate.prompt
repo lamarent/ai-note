@@ -1,0 +1,164 @@
+# Prompt: AI-assisted SaaS Boilerplate Generation
+
+## Goal
+Generate a comprehensive SaaS boilerplate project designed for rapid development and optimized for AI-assisted autonomous development workflows. The project should follow modern best practices, utilize a specific tech stack, and include foundational features for context tracking and knowledge management.
+
+## Core Technologies
+
+*   **Monorepo:** PNPM Workspaces
+*   **Frontend:**
+    *   Framework: React (using Vite for build tooling)
+    *   UI Library: DaisyUI (on top of Tailwind CSS)
+    *   State Management: Zustand
+    *   Data Fetching/Caching: React Query
+    *   Forms: React Hook Form
+*   **Backend:**
+    *   Runtime: Cloudflare Workers
+    *   Framework: Hono
+    *   Validation: Zod
+    *   **Advanced Features:**
+        *   **Hono RPC:**
+            *   Implement type-safe RPC endpoints using Hono's RPC module
+            *   Use Zod schemas for request/response types
+            *   Support both HTTP and WebSocket RPC endpoints
+            *   Automatic error handling and serialization
+        *   **Router Features:**
+            *   Route grouping and nesting
+            *   Middleware composition
+            *   Type-safe route parameters and query strings
+            *   Custom response types
+        *   **Development Tools:**
+            *   Hot reload support
+            *   Request logging
+            *   Performance monitoring
+            *   Error tracking
+    *   **Auth:**
+    *   Auth Provider: Supabase Auth
+        *   Social providers (Google, GitHub)
+        *   JWT token handling
+    *   Database: 
+        *   Prisma ORM with PostgreSQL
+*   **Language:** TypeScript throughout the stack (frontend, backend)
+
+## Project Structure (Monorepo)
+
+```
+/
+|-- apps/
+|   |-- web/             # React Frontend (Vite, DaisyUI, Zustand, React Query, RHF)
+|   |   |-- public/
+|   |   |-- src/
+|   |   |   |-- api/         # API client logic (using React Query)
+|   |   |   |-- assets/
+|   |   |   |-- components/  # Reusable UI components (DaisyUI styled)
+|   |   |   |-- features/    # Feature-specific modules (e.g., auth, dashboard)
+|   |   |   |-- hooks/       # Custom React hooks
+|   |   |   |-- layouts/     # Page layouts
+|   |   |   |-- pages/       # Page components
+|   |   |   |-- store/       # Zustand stores
+|   |   |   |-- styles/      # Global styles, Tailwind config
+|   |   |   |-- types/       # Frontend specific types
+|   |   |   |-- utils/       # Utility functions
+|   |   |   |-- App.tsx
+|   |   |   |-- main.tsx
+|   |   |-- index.html
+|   |   |-- package.json
+|   |   |-- tsconfig.json
+|   |   |-- vite.config.ts
+|   |   `-- tailwind.config.js
+|   `-- worker/          # Cloudflare Worker Backend (Hono, Zod)
+|       |-- src/
+|       |   |-- features/    # Feature-specific API routes/logic (e.g., auth, users)
+|       |   |   `-- index.ts # Entry point for feature routes
+|       |   |-- middleware/  # Hono middleware (e.g., auth checks)
+|       |   |-- types/       # Shared types (potentially linked from packages/types)
+|       |   |-- utils/       # Backend utility functions
+|       |   |-- db.ts        # Postgres setup
+|       |   |-- index.ts     # Main Hono application entry point
+|       |-- package.json
+|       |-- tsconfig.json
+|       `-- wrangler.toml    # Cloudflare Worker configuration
+|-- packages/
+|   |-- ui/              # Shared UI components (optional, if needed across apps)
+|   |   |-- src/
+|   |   |-- package.json
+|   |   `-- tsconfig.json
+|   |-- types/           # Shared TypeScript types (Zod schemas)
+|   |   |-- src/
+|   |   |-- package.json
+|   |   `-- tsconfig.json
+|   `-- config/          # Shared configurations (e.g., ESLint, Prettier)
+|       |-- eslint-preset.js
+|       `-- prettier-preset.js
+|-- docs/                # Project documentation
+|   |-- ADR/             # Architecture Decision Records
+|   |-- README.md
+|   `-- Setup.md         # Setup and deployment instructions
+|-- scripts/             # Utility scripts (e.g., DB migration, deployment)
+|-- .env.example         # Example environment variables
+|-- .gitignore
+|-- package.json         # Root package.json for PNPM workspace
+|-- pnpm-workspace.yaml
+`-- tsconfig.base.json   # Base TypeScript config
+```
+
+## Core Features
+
+1.  **Authentication:**
+    *   Supabase Auth for identity management only
+    *   JWT verification in Hono middleware
+    *   User ID mapping to Prisma database records
+    *   No direct Supabase database access
+2.  **Database Setup:**
+    *   Prisma schema for:
+        *   Users table (linked to Supabase auth via UUID)
+        *   Application-specific tables
+    *   Prisma client setup in Cloudflare Worker
+    *   Database migrations system
+    *   Type-safe query building
+3.  **API Layer:**
+    *   Hono backend with basic CRUD endpoints for a sample resource.
+    *   Use Zod for input validation (request bodies, query params).
+    *   Standardized API response format.
+    *   Error handling middleware.
+4.  **Frontend Foundation:**
+    *   Vite setup with React, TypeScript, TailwindCSS, DaisyUI.
+    *   Basic routing setup (e.g., using `react-router-dom`).
+    *   React Query setup for API interaction.
+    *   Zustand store for global state (e.g., user auth status).
+    *   React Hook Form setup for a sample form (e.g., login/signup).
+    *   Basic layout structure (e.g., Navbar, Sidebar, Main Content).
+5.  **Tooling & DX:**
+    *   PNPM workspace configuration.
+    *   Shared ESLint and Prettier configurations enforced across packages/apps.
+    *   Base `tsconfig.json` and individual project tsconfigs.
+    *   Example environment variable setup (`.env.example`, loading in Vite and Workers).
+    *   Basic scripts in root `package.json` for common tasks (e.g., `dev`, `build`, `lint`, `test`).
+
+## AI-Friendly / Autonomous Development Features
+
+1.  **Project Context Tracking:**
+    *   **Clear Documentation:** Well-documented code (TSDoc), `README` files in each package/app, `Setup.md` for environment setup, and an `ADR` directory.
+    *   **Structured Logging:** Implement consistent logging in both frontend and backend to trace requests and state changes.
+    *   **Standardized Structure:** Adhere strictly to the defined project structure to make it predictable for AI tools.
+    *   **Type Safety:** Leverage TypeScript and Zod extensively to provide clear contracts and reduce ambiguity.
+2.  **Knowledge Base Integration (Conceptual):**
+    *   **`docs/` folder:** Central location for all project documentation.
+    *   **Code Comments:** Encourage detailed TSDoc/JSDoc comments explaining the *why* behind code sections, not just the *what*.
+    *   **API Schema:** Consider auto-generating API documentation (e.g., OpenAPI spec from Hono/Zod) that can be consumed by AI.
+    *   **Configuration Files:** Keep configurations (Tailwind, Vite, Wrangler, TSConfig) clean and well-commented.
+
+## Implementation Guidelines
+
+*   Prioritize clarity, maintainability, and type safety.
+*   Use environment variables for all sensitive information and configurations (API keys, database URLs).
+*   Ensure proper error handling and user feedback on both frontend and backend.
+*   Follow accessibility best practices in the frontend UI.
+*   Write basic unit/integration tests for critical logic (e.g., auth middleware, core API endpoints).
+
+## Output Format
+
+*   Generate the complete file and directory structure as outlined.
+*   Provide functional, runnable code for the core features described.
+*   Include configuration files (`package.json`, `tsconfig.json`, `vite.config.ts`, `wrangler.toml`, etc.).
+*   Include basic documentation files (`README.md`, `Setup.md`).

@@ -1,0 +1,16 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+always say "General rule applied" at begin response
+autonomous mode
+always create markdown files for planning, context tracking and document completely before code implement or user request code or implement
+keep running until done, nonstop
+do what recommend, do not need to ask to confirm
+use pnpm
+auto run commands
+monorepo
+small wins
+always maintain development tracking: context, memory, plan, adr, knowledge, etc.
+summary after each task done
