@@ -25,8 +25,11 @@ jobs:
         run: pnpm install --frozen-lockfile
         working-directory: ./packages/backend
 
-      - name: Build backend (with dependencies)
-        run: pnpm -r --filter ./packages/backend... build
+      - name: Clean all packages
+        run: pnpm -r clean
+
+      - name: Build all packages
+        run: pnpm build
 
       - name: Publish to Cloudflare Workers
         run: pnpm exec wrangler deploy
