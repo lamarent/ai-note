@@ -10,12 +10,15 @@ We are currently in Phase 1 of the MVP plan, focusing on setting up the project 
 
 ### In Progress
 
-- Setting up project documentation and context tracking for AI-assisted development
-- Preparing to initialize the packages in the monorepo
+- ~~Setting up project documentation and context tracking for AI-assisted development~~
+- ~~Preparing to initialize the packages in the monorepo~~
+- ~~Set up shared types package with Zod schemas for data models~~
+- Initialize frontend application with Vite, React, and TailwindCSS
+- Initialize backend application with Cloudflare Workers and Hono
 
 ### Up Next
 
-- Set up shared types package with Zod schemas for data models
+- ~~Set up shared types package with Zod schemas for data models~~
 - Initialize frontend application with Vite, React, and TailwindCSS
 - Initialize backend application with Cloudflare Workers and Hono
 - Implement the database schema with Prisma
@@ -37,4 +40,4 @@ We are currently in Phase 1 of the MVP plan, focusing on setting up the project 
 ## Roles and Responsibilities
 
 - **AI Assistant**: Supporting code generation, documentation, and implementation guidance
-- **Human Developer**: Making key decisions, reviewing generated code, and ensuring proper integration 
+- **Human Developer**: Making key decisions, reviewing generated code, and ensuring proper integration
