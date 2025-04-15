@@ -1,0 +1,11 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/types" },
+    { "path": "./packages/backend" },
+    { "path": "./packages/frontend" },
+    { "path": "./packages/config" },
+    { "path": "./packages/ui" },
+    { "path": "./packages/database" }
+  ]
+}
