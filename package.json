@@ -16,7 +16,8 @@
     "clean": "pnpm -r clean",
     "db:migrate": "cd apps/worker && pnpm db:migrate",
     "db:migrate:create": "cd apps/worker && pnpm db:migrate:create",
-    "db:migrate:down": "cd apps/worker && pnpm db:migrate:down"
+    "db:migrate:down": "cd apps/worker && pnpm db:migrate:down",
+    "type-check": "tsc --noEmit"
   },
   "devDependencies": {
     "typescript": "^5.2.2",
