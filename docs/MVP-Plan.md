@@ -18,8 +18,8 @@ The MVP will deliver a functioning AI-powered brainstorming tool that allows ind
 - Set up monorepo structure with PNPM
 - Configure development environment (TypeScript, ESLint, Prettier)
 - Set up CI/CD pipeline
-- Create initial frontend app (Vite, React, TailwindCSS)
-- Create initial backend app (Cloudflare Workers, Hono)
+- Create initial frontend app (Vite, React, TailwindCSS, DaisyUI)
+- Create initial backend app (Cloudflare Workers, Hono, Prisma, PostgreSQL)
 - Implement basic API communication
 
 **Deliverable**: Running application with "Hello World" functionality and proper project structure.
