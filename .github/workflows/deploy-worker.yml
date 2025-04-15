@@ -35,8 +35,11 @@ jobs:
         run: pnpm install --frozen-lockfile
         working-directory: ./packages/backend
 
-      - name: Build backend and dependencies
-        run: pnpm -r --filter ./packages/backend... build
+      - name: Build types package
+        run: pnpm --filter @ai-brainstorm/types build
+
+      - name: Build backend
+        run: pnpm --filter backend build
 
       - name: Publish to Cloudflare Workers
         run: pnpm exec wrangler deploy
