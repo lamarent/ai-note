@@ -71,7 +71,7 @@ The AI Brainstorm app follows a modern web application architecture with separat
 
 ```
 /
-|-- apps/
+|-- packages/
 |   |-- web/             # React Frontend
 |   `-- worker/          # Cloudflare Worker Backend
 |-- packages/

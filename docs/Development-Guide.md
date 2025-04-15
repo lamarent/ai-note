@@ -65,7 +65,7 @@ The application follows a monorepo structure using PNPM workspaces:
 
 ```
 /
-|-- apps/
+|-- packages/
 |   |-- web/             # React Frontend
 |   `-- worker/          # Cloudflare Worker Backend
 |-- packages/

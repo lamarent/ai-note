@@ -44,7 +44,7 @@ Generate a comprehensive SaaS boilerplate project designed for rapid development
 
 ```
 /
-|-- apps/
+|-- packages/
 |   |-- web/             # React Frontend (Vite, DaisyUI, Zustand, React Query, RHF)
 |   |   |-- public/
 |   |   |-- src/

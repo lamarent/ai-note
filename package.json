@@ -14,18 +14,19 @@
     "format": "pnpm -r format",
     "test": "pnpm -r test",
     "clean": "pnpm -r clean",
-    "db:migrate": "cd apps/worker && pnpm db:migrate",
-    "db:migrate:create": "cd apps/worker && pnpm db:migrate:create",
-    "db:migrate:down": "cd apps/worker && pnpm db:migrate:down",
+    "db:migrate": "cd packages/worker && pnpm db:migrate",
+    "db:migrate:create": "cd packages/worker && pnpm db:migrate:create",
+    "db:migrate:down": "cd packages/worker && pnpm db:migrate:down",
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
     "typescript": "^5.2.2",
-    "prettier": "^3.0.3"
+    "prettier": "^3.0.3",
+    "wrangler": "^4.11.0"
   },
   "workspaces": {
     "packages": [
-      "apps/*",
+      "packages/*",
       "packages/*"
     ]
   }
