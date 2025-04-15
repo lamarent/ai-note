@@ -1,5 +1,7 @@
 # AI Brainstorm
 
+[![CI](https://github.com/yourusername/ai-brainstorm/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/yourusername/ai-brainstorm/actions/workflows/ci.yml)
+
 An AI-powered brainstorming application that helps users generate, organize, and refine ideas.
 
 ## Overview
@@ -34,20 +36,24 @@ AI Brainstorm is a web application that leverages artificial intelligence to fac
 ### Development Setup
 
 1. Clone the repository:
+
    ```
    git clone https://github.com/yourusername/ai-brainstorm.git
    cd ai-brainstorm
    ```
 
 2. Install dependencies:
+
    ```
    pnpm install
    ```
 
 3. Set up environment variables:
+
    ```
    cp .env.example .env
    ```
+
    Then edit the `.env` file with your database and API credentials.
 
 4. Start the development servers:

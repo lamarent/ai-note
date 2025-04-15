@@ -27,10 +27,16 @@ This document outlines the planned next steps for the AI Brainstorm project.
    - Set up development environment
 
 4. **Implement database integration** ✅
+
    - Create Prisma schema based on database design
    - Set up database connection
    - Generate Prisma client
    - Create initial migration
+
+5. **Set up CI/CD pipeline** ✅
+   - GitHub Actions for testing, linting, and type-checking (pnpm monorepo)
+   - All packages now pass lint, type-check, and test in CI
+   - Environment configuration and caching handled
 
 ## Short-term Goals (1-2 weeks)
 
@@ -46,10 +52,10 @@ This document outlines the planned next steps for the AI Brainstorm project.
    - Idea categorization
    - Position/ordering support
 
-3. **Set up CI/CD pipeline**
-   - GitHub Actions for testing and linting
-   - Deployment workflows
-   - Environment configuration
+3. **Enhance CI/CD pipeline**
+   - Add deployment workflows for frontend (Cloudflare Pages) and backend (Cloudflare Workers)
+   - Add status badge to README
+   - Document environment variable setup for CI/CD
 
 ## Medium-term Goals (2-4 weeks)
 
@@ -80,8 +86,8 @@ This document outlines the planned next steps for the AI Brainstorm project.
 | Initialize frontend         | High     | Medium     | ✅ Completed | AI Assistant |
 | Initialize backend          | High     | Medium     | ✅ Completed | AI Assistant |
 | Implement database schema   | High     | High       | ✅ Completed | AI Assistant |
-| Set up CI/CD                | Medium   | Medium     | Not Started  | TBD          |
+| Set up CI/CD                | Medium   | Medium     | ✅ Completed | AI Assistant |
 
 ---
 
-_Last updated: 2023-08-28_
+_Last updated: 2024-06-09_

@@ -4,38 +4,43 @@ This document describes what's currently being worked on in the AI Brainstorm pr
 
 ## Active Development
 
-**Phase 1: Project Setup and Core Infrastructure**
+**Phase 2: Core Features & Deployment**
 
-We are currently in Phase 1 of the MVP plan, focusing on setting up the project structure and core infrastructure.
+We have completed Phase 1 (project setup, infrastructure, and CI/CD). The current focus is on core feature development and enhancing deployment workflows.
+
+### Recently Completed
+
+- ✅ Project documentation and context tracking
+- ✅ Monorepo setup with pnpm workspaces
+- ✅ Shared types package with Zod schemas
+- ✅ Frontend and backend initialization
+- ✅ Database schema and integration
+- ✅ CI/CD pipeline (GitHub Actions for lint, type-check, test; all packages pass in CI)
 
 ### In Progress
 
-- ~~Setting up project documentation and context tracking for AI-assisted development~~
-- ~~Preparing to initialize the packages in the monorepo~~
-- ~~Set up shared types package with Zod schemas for data models~~
-- Initialize frontend application with Vite, React, and TailwindCSS
-- Initialize backend application with Cloudflare Workers and Hono
+- Implement core brainstorming session functionality (CRUD, UI, API)
+- Implement basic idea management (add, edit, delete, categorize)
+- Enhance CI/CD with deployment workflows (Cloudflare Pages, Workers)
 
 ### Up Next
 
-- ~~Set up shared types package with Zod schemas for data models~~
-- Initialize frontend application with Vite, React, and TailwindCSS
-- Initialize backend application with Cloudflare Workers and Hono
-- Implement the database schema with Prisma
+- Add deployment status badge to README
+- Document environment variable setup for CI/CD
+- Begin AI service integration (OpenAI API, prompt templates)
 
 ## Current Sprint Goals
 
-1. Complete all initial project setup
-2. Have a working "Hello World" app with frontend and backend communication
-3. Set up basic CI/CD pipeline
-4. Implement foundational database models
+1. Implement core session and idea management features
+2. Enhance CI/CD with deployment workflows
+3. Prepare for AI service integration
 
 ## Technical Focus Areas
 
-- **Frontend**: Initial setup of Vite + React + TailwindCSS + DaisyUI
-- **Backend**: Initial setup of Cloudflare Workers + Hono + Zod
-- **Database**: Prisma schema definition based on [ADR 2: Database Schema Design](../../ADR/002-database-schema-design.md)
-- **Infrastructure**: Local development environment setup
+- **Frontend**: Session/idea management UI, state management
+- **Backend**: API endpoints for sessions/ideas, validation
+- **CI/CD**: Deployment automation, environment config
+- **AI**: Service abstraction, prompt design (upcoming)
 
 ## Roles and Responsibilities
 

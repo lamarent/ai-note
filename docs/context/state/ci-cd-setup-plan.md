@@ -33,27 +33,26 @@ This document tracks the plan, context, and actionable steps for setting up Cont
 ## Current State
 
 - Monorepo initialized with pnpm workspaces
-- No CI/CD workflows configured yet
-- Scripts for lint, test, and build exist in package.json
-- Deployment scripts exist for manual use
+- CI/CD workflows for lint, type-check, and test are passing
+- Deployment workflows for frontend and backend are implemented
+- CI status badge added to README
 
 ## Plan & Checklist
 
-- [ ] Create `.github/workflows/ci.yml` for install, lint, type-check, and test (all packages)
-- [ ] Use pnpm for all install and script steps
-- [ ] Add caching for pnpm store
-- [ ] Add status badge to README
-- [ ] Create `.github/workflows/deploy-web.yml` for frontend deploy (Cloudflare Pages)
-- [ ] Create `.github/workflows/deploy-worker.yml` for backend deploy (Cloudflare Workers)
+- [x] Create `.github/workflows/ci.yml` for install, lint, type-check, and test (all packages)
+- [x] Use pnpm for all install and script steps
+- [x] Add caching for pnpm store
+- [x] Add status badge to README
+- [x] Create `.github/workflows/deploy-web.yml` for frontend deploy (Cloudflare Pages)
+- [x] Create `.github/workflows/deploy-worker.yml` for backend deploy (Cloudflare Workers)
 - [ ] Document environment variable setup for CI/CD
 - [ ] Incrementally improve workflows (e.g., add preview deploys, notifications)
 
 ## Next Actions
 
-1. Implement minimal CI workflow for install, lint, type-check, and test
-2. Verify workflow runs on PR and push to main
-3. Add deployment workflows for frontend and backend
-4. Update documentation and troubleshooting as needed
+1. Document environment variable setup for CI/CD and deployment workflows
+2. Monitor deployments and update troubleshooting docs as needed
+3. Continue with core feature and AI integration development
 
 ---
 
