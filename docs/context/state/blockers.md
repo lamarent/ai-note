@@ -4,11 +4,12 @@ This document tracks current blockers, challenges, and open questions for the AI
 
 ## Current Blockers
 
-*No critical blockers at this time.*
+_No critical blockers at this time._
 
 ## Technical Challenges
 
 1. **Cloudflare Workers Integration with Prisma**
+
    - Need to research best practices for using Prisma with Cloudflare Workers
    - Potential limitations due to serverless environment
    - Solution research: Look into connection pooling options and Edge-compatible ORM patterns
@@ -21,11 +22,13 @@ This document tracks current blockers, challenges, and open questions for the AI
 ## Open Questions
 
 1. **Database Hosting**
+
    - What's the best PostgreSQL hosting option for this project?
    - Options: Supabase, Railway, Neon, self-hosted
    - Decision needed by: Before backend implementation
 
 2. **Authentication Implementation**
+
    - When should we integrate Supabase Auth?
    - Should we design the system with auth in mind from the start, even if it's implemented later?
    - Decision needed by: During database schema definition
@@ -37,7 +40,7 @@ This document tracks current blockers, challenges, and open questions for the AI
 
 ## Dependency Issues
 
-*No dependency issues at this time.*
+_No dependency issues at this time._
 
 ## Resource Constraints
 
@@ -47,4 +50,4 @@ This document tracks current blockers, challenges, and open questions for the AI
 
 ---
 
-*Last updated: 2023-08-28* 
+_Last updated: 2025-04-15_

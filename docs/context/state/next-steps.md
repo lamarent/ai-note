@@ -53,18 +53,15 @@ This document outlines the planned next steps for the AI Brainstorm project.
    - Position/ordering support
 
 3. **Enhance CI/CD pipeline**
-
    - Add deployment workflows for frontend (Cloudflare Pages) and backend (Cloudflare Workers)
    - Add status badge to README
    - Document environment variable setup for CI/CD
-
-4. **Maintain and update context tracking and planning (general.mdc rule)**
 
 ## Medium-term Goals (2-4 weeks)
 
 1. **Implement AI service integration**
 
-   - Design service abstraction for OpenAI API
+   - OpenAI API connection
    - Prompt templates for different techniques
    - Caching layer for responses
    - Rate limiting and cost control

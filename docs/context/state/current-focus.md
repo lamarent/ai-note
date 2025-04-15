@@ -22,13 +22,12 @@ We have completed Phase 1 (project setup, infrastructure, and CI/CD). The curren
 - Implement core brainstorming session functionality (CRUD, UI, API)
 - Implement basic idea management (add, edit, delete, categorize)
 - Enhance CI/CD with deployment workflows (Cloudflare Pages, Workers)
-- Maintain and update context tracking and planning (general.mdc rule)
 
 ### Up Next
 
-- Begin AI service integration (OpenAI API, prompt templates, caching, rate limiting)
 - Add deployment status badge to README
 - Document environment variable setup for CI/CD
+- Begin AI service integration (OpenAI API, prompt templates)
 
 ## Current Sprint Goals
 

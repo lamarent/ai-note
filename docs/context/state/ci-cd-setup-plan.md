@@ -45,7 +45,7 @@ This document tracks the plan, context, and actionable steps for setting up Cont
 - [x] Add status badge to README
 - [x] Create `.github/workflows/deploy-web.yml` for frontend deploy (Cloudflare Pages)
 - [x] Create `.github/workflows/deploy-worker.yml` for backend deploy (Cloudflare Workers)
-- [ ] Document environment variable setup for CI/CD
+- [x] Document environment variable setup for CI/CD
 - [ ] Incrementally improve workflows (e.g., add preview deploys, notifications)
 
 ## Next Actions
@@ -56,4 +56,4 @@ This document tracks the plan, context, and actionable steps for setting up Cont
 
 ---
 
-_Last updated: 2024-06-09_
+_Last updated: 2025-04-15_

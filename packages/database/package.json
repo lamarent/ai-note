@@ -1,5 +1,5 @@
 {
-  "name": "database",
+  "name": "@ai-brainstorm/database",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,9 +8,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^6.6.0"
+    "@prisma/adapter-pg": "^6.6.0",
+    "@prisma/client": "^6.6.0",
+    "pg": "^8.14.1"
   },
   "devDependencies": {
+    "@types/pg": "^8.11.13",
     "prisma": "^6.6.0"
   }
 }

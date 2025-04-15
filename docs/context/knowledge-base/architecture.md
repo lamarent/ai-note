@@ -13,6 +13,7 @@ We're organizing React components following this pattern:
 3. **Co-location of Related Files** - Keep styles, tests, and components together
 
 Example structure:
+
 ```
 /components
   /ui              # Reusable UI components (atoms/molecules)
@@ -35,11 +36,12 @@ Example structure:
 
 ### State Management Approach
 
-- **Zustand**: For global application state 
+- **Zustand**: For global application state
 - **React Query**: For server state and data fetching
 - **Local State**: For component-specific state
 
 State separation:
+
 - **UI State**: Modals, tooltips, current tab (Zustand)
 - **Data State**: Sessions, ideas (React Query)
 - **Form State**: Input values, validation (React Hook Form)
@@ -56,6 +58,7 @@ State separation:
 ### Middleware Stack
 
 Typical request flow:
+
 1. CORS handling
 2. Request logging
 3. Authentication (future)
@@ -120,4 +123,4 @@ Typical request flow:
 
 ---
 
-*Last updated: 2023-08-28* 
+_Last updated: 2025-04-15_

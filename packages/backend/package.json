@@ -12,9 +12,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@ai-brainstorm/database": "workspace:^",
     "@ai-brainstorm/types": "workspace:*",
     "@hono/zod-validator": "^0.4.3",
     "@prisma/client": "^6.6.0",
+    "database": "link:../database",
     "hono": "^4.7.6"
   },
   "devDependencies": {

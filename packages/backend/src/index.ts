@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { PrismaClient } from "@prisma/client"; // Assuming prisma client is configured for edge
+import { createPrismaClient } from "@ai-brainstorm/database";
 import { zValidator } from "@hono/zod-validator";
 import {
   CreateSessionSchema,
@@ -36,22 +36,10 @@ type ValidatedData = {
 // Apply Env and the combined Schema shape to Hono instance
 const app = new Hono<{ Bindings: Env }, ValidatedData>();
 
-// Initialize Prisma Client (consider connection pooling/management for production)
-// This basic initialization might need adjustment based on Cloudflare Workers context
-// See: https://www.prisma.io/docs/guides/deployment/deploying-to-cloudflare-workers
-// Note: Using the direct import might require the `wasm` build target in Prisma schema
-// and potentially polyfills depending on the runtime environment.
-// For full compatibility, especially outside basic CRUD, consider using Prisma Accelerate or Data Proxy.
-
-// Define a factory or context injection for PrismaClient
-const getPrismaClient = (c: Context<{ Bindings: Env }>) => {
-  // It's generally better to instantiate Prisma Client once per request or use a pool.
-  // For simplicity here, we create it on demand. Consider lifecycle management.
-  // Cloudflare Workers might require specific adapters or configurations.
-  return new PrismaClient({
-    datasourceUrl: c.env.DATABASE_URL,
-  });
-};
+// Helper to get Prisma client per request (Cloudflare Worker best practice)
+function getPrisma(c: Context<{ Bindings: Env }>) {
+  return createPrismaClient(c.env.DATABASE_URL);
+}
 
 app.get("/", (c: Context<{ Bindings: Env }>) => {
   return c.text("Hello AI Brainstorm Backend!");
@@ -65,7 +53,7 @@ app.get("/api", (c: Context<{ Bindings: Env }>) => {
 
 // GET /api/sessions - List all sessions
 app.get("/api/sessions", async (c: Context<{ Bindings: Env }>) => {
-  const prisma = getPrismaClient(c);
+  const prisma = getPrisma(c);
   try {
     const sessions = await prisma.session.findMany();
     return c.json(sessions);
@@ -80,7 +68,7 @@ app.get("/api/sessions", async (c: Context<{ Bindings: Env }>) => {
 
 // GET /api/sessions/:id - Get a single session
 app.get("/api/sessions/:id", async (c: Context<{ Bindings: Env }>) => {
-  const prisma = getPrismaClient(c);
+  const prisma = getPrisma(c);
   const id = c.req.param("id");
   try {
     const session = await prisma.session.findUnique({ where: { id } });
@@ -112,17 +100,31 @@ app.post(
     }
   }),
   async (c) => {
-    const prisma = getPrismaClient(c);
+    const prisma = getPrisma(c);
     const createData = c.req.valid("json") as CreateSession;
     // TODO: Get ownerId from authentication context when implemented
-    const ownerId = "user_placeholder_uuid"; // Replace with actual authenticated user ID
+    const ownerId = "00000000-0000-0000-0000-000000000000"; // Use valid UUID placeholder
+
+    // Prepare data for Prisma
+    const prismaData: any = {
+      ...createData,
+      ownerId: ownerId, // Use actual authenticated user ID
+    };
+    // If collaborators is present and is an array, map to connect format
+    if (
+      Array.isArray(createData.collaborators) &&
+      createData.collaborators.length > 0
+    ) {
+      prismaData.collaborators = {
+        connect: createData.collaborators.map((id) => ({ id })),
+      };
+    } else {
+      delete prismaData.collaborators;
+    }
 
     try {
       const newSession = await prisma.session.create({
-        data: {
-          ...createData,
-          ownerId: ownerId, // Use actual authenticated user ID
-        },
+        data: prismaData,
       });
       return c.json(newSession, 201);
     } catch (error: any) {
@@ -151,16 +153,29 @@ app.put(
     }
   }),
   async (c) => {
-    const prisma = getPrismaClient(c);
+    const prisma = getPrisma(c);
     const id = c.req.param("id");
     const updateData = c.req.valid("json") as UpdateSession;
+
+    // Prepare data for Prisma
+    const prismaData: any = { ...updateData };
+    // Remove ownerId if present (do not allow changing owner via update)
+    delete prismaData.ownerId;
+    // If collaborators is present and is an array, map to set/connect format
+    if (Array.isArray(updateData.collaborators)) {
+      prismaData.collaborators = {
+        set: updateData.collaborators.map((id) => ({ id })),
+      };
+    } else {
+      delete prismaData.collaborators;
+    }
 
     // TODO: Add authorization check - ensure user owns the session or has permission
 
     try {
       const updatedSession = await prisma.session.update({
         where: { id },
-        data: updateData,
+        data: prismaData,
       });
       return c.json(updatedSession);
     } catch (error: any) {
@@ -179,7 +194,7 @@ app.put(
 
 // DELETE /api/sessions/:id - Delete a session
 app.delete("/api/sessions/:id", async (c: Context<{ Bindings: Env }>) => {
-  const prisma = getPrismaClient(c);
+  const prisma = getPrisma(c);
   const id = c.req.param("id");
 
   // TODO: Add authorization check - ensure user owns the session or has permission

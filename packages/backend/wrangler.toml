@@ -13,8 +13,8 @@ port = 8787
 # live_reload = true # Typically enabled by default
 
 # Bindings for development (replace with actual bindings in production)
-# [vars]
-# DATABASE_URL = "your_dev_database_url"
+[vars]
+DATABASE_URL = "postgresql://postgres:postgres@127.0.0.1:54322/ai_brainstorm"
 # OPENAI_API_KEY = "your_dev_openai_key"
 
 # Example KV Namespace binding for dev
