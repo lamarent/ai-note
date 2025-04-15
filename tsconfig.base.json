@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "jsx": "react-jsx",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@ai-brainstorm/ui/*": ["packages/ui/src/*"],
+      "@ai-brainstorm/types/*": ["packages/types/src/*"],
+      "@ai-brainstorm/config/*": ["packages/config/*"]
+    }
+  },
+  "exclude": ["node_modules"]
+} 

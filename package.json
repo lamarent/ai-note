@@ -1,0 +1,31 @@
+{
+  "name": "ai-brainstorm",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-powered brainstorming application",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "packageManager": "pnpm@8.6.0",
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "format": "pnpm -r format",
+    "test": "pnpm -r test",
+    "clean": "pnpm -r clean",
+    "db:migrate": "cd apps/worker && pnpm db:migrate",
+    "db:migrate:create": "cd apps/worker && pnpm db:migrate:create",
+    "db:migrate:down": "cd apps/worker && pnpm db:migrate:down"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "prettier": "^3.0.3"
+  },
+  "workspaces": {
+    "packages": [
+      "apps/*",
+      "packages/*"
+    ]
+  }
+}
