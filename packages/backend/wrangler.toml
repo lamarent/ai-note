@@ -1,0 +1,31 @@
+name = "ai-brainstorm-backend"
+main = "src/index.ts"
+compatibility_date = "2024-04-05"
+
+# Enable Node.js compatibility
+# https://developers.cloudflare.com/workers/runtime-apis/nodejs/
+compatibility_flags = [ "nodejs_compat" ]
+
+
+[dev]
+# Expose the dev server on localhost:8787
+port = 8787
+# live_reload = true # Typically enabled by default
+
+# Bindings for development (replace with actual bindings in production)
+# [vars]
+# DATABASE_URL = "your_dev_database_url"
+# OPENAI_API_KEY = "your_dev_openai_key"
+
+# Example KV Namespace binding for dev
+# [[kv_namespaces]]
+# binding = "MY_KV_NAMESPACE"
+# id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+# preview_id = "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
+
+# Example D1 Database binding for dev
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "my-database-dev"
+# database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+# preview_database_id = "yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy" 

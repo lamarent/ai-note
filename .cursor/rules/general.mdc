@@ -16,3 +16,4 @@ monorepo
 minimal, small wins, keep simple, runable, workable first
 always maintain development tracking: context, memory, plan, adr, knowledge, etc.
 summary after each task done, next actions
+read or search library doc before use
