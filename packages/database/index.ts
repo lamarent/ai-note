@@ -1,8 +1,9 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaD1 } from "@prisma/adapter-d1";
+import { D1Database } from "@cloudflare/workers-types";
 
-export function createPrismaClient(databaseUrl: string) {
-  const adapter = new PrismaPg({ connectionString: databaseUrl });
+export function createPrismaClient(d1Database: D1Database) {
+  const adapter = new PrismaD1(d1Database);
   return new PrismaClient({ adapter });
 }
 

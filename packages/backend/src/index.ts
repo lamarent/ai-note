@@ -9,6 +9,7 @@ import {
   UpdateSession,
 } from "@ai-brainstorm/types";
 import type { Context } from "hono";
+import { D1Database } from "@cloudflare/workers-types";
 
 // Define the expected environment bindings
 // See https://hono.dev/getting-started/cloudflare-workers#bindings
@@ -16,15 +17,13 @@ export type Env = {
   // Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
   // MY_KV_NAMESPACE: KVNamespace
   // Example binding to D1. Learn more at https://developers.cloudflare.com/workers/runtime-apis/d1/
-  // DB: D1Database
+  DB: D1Database;
   // Example binding to Durable Object. Learn more at https://developers.cloudflare.com/workers/runtime-apis/durable-objects/
   // MY_DURABLE_OBJECT: DurableObjectNamespace
   // Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
   // MY_BUCKET: R2Bucket
   // Example binding to AI Gateway. Learn more at https://developers.cloudflare.com/ai-gateway/
   // AI: Ai
-  // Add your own bindings here, e.g., database URLs, API keys
-  DATABASE_URL: string; // Ensure this is bound in wrangler.toml or Cloudflare dashboard
   // OPENAI_API_KEY: string
 };
 
@@ -38,7 +37,7 @@ const app = new Hono<{ Bindings: Env }, ValidatedData>();
 
 // Helper to get Prisma client per request (Cloudflare Worker best practice)
 function getPrisma(c: Context<{ Bindings: Env }>) {
-  return createPrismaClient(c.env.DATABASE_URL);
+  return createPrismaClient(c.env.DB);
 }
 
 app.get("/", (c: Context<{ Bindings: Env }>) => {

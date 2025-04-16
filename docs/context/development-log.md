@@ -57,3 +57,13 @@ This file tracks the development activities of the AI Brainstorm app in reverse 
 - Initialize frontend application with Vite
 - Initialize backend application with Cloudflare Workers
 - Implement basic API communication between frontend and backend
+
+## 2024-04-27: Foreign Key Constraint Error on Session Creation
+
+- **Issue:** Encountered a foreign key constraint error when creating a session via the backend API. Error message:
+  - `Failed to create session: Foreign key constraint violated`
+- **Root Cause:** The hardcoded `ownerId` ("00000000-0000-0000-0000-000000000000") used for development/testing does not exist in the `User` table, violating the foreign key constraint.
+- **Solution:** Add a dummy user with the placeholder UUID to the `User` table for development and testing. Ensure all collaborator IDs also exist in the `User` table.
+- **Next Steps:**
+  - Add a migration or seed script to insert the dummy user if not present.
+  - Update documentation to reflect this requirement for local/dev environments.

@@ -64,3 +64,13 @@ CREATE UNIQUE INDEX "_CollaboratingSessions_AB_unique" ON "_CollaboratingSession
 
 -- CreateIndex
 CREATE INDEX "_CollaboratingSessions_B_index" ON "_CollaboratingSessions"("B");
+
+-- Add dummy user for development/testing (required for foreign key constraints)
+INSERT OR IGNORE INTO "User" ("id", "email", "name", "avatar", "createdAt", "updatedAt") VALUES (
+  '00000000-0000-0000-0000-000000000000',
+  'dummy@ai-brainstorm.local',
+  'Dummy User',
+  NULL,
+  CURRENT_TIMESTAMP,
+  CURRENT_TIMESTAMP
+);
