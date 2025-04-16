@@ -1,100 +1,43 @@
-# Database Package
+# @ai-brainstorm/database
 
-This package provides Prisma integration with Cloudflare D1 SQLite for use with Cloudflare Workers.
-
-## Features
-
-- Prisma ORM configured for Cloudflare D1 SQLite
-- Simple client factory for Worker environments
-- Automatic migration setup for Cloudflare D1
+Database package for AI Note application using Prisma with Cloudflare D1.
 
 ## Setup
 
-1. Make sure you have wrangler installed globally or use npx:
+This package provides a Prisma client setup for Cloudflare D1 database using the driver adapter.
 
-   ```bash
-   npm install -g wrangler
-   # or
-   pnpm add -g wrangler
-   ```
-
-2. Login to Cloudflare (if not already logged in):
-
-   ```bash
-   wrangler login
-   ```
-
-3. Run the setup script to initialize D1:
-
-   ```bash
-   pnpm setup
-   ```
-
-   This will:
-
-   - Create a D1 database in your Cloudflare account
-   - Generate the Prisma client
-   - Create the initial migration
-   - Push the schema to D1
-   - Update wrangler.toml with the correct database ID
-
-## Usage in Cloudflare Workers (Hono)
+## Usage
 
 ```typescript
-import { Hono } from "hono";
-import { createPrismaClient } from "@ai-brainstorm/database";
+import { getPrismaClient } from "@ai-brainstorm/database";
 
-export type Env = {
-  DB: D1Database;
+// In a Cloudflare Worker
+export default {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext) {
+    const prisma = await getPrismaClient(env.DB);
+
+    // Use prisma client
+    const users = await prisma.user.findMany();
+
+    return new Response(JSON.stringify(users));
+  },
 };
-
-const app = new Hono<{ Bindings: Env }>();
-
-// Helper to get Prisma client per request (Worker best practice)
-function getPrisma(c) {
-  return createPrismaClient(c.env.DB);
-}
-
-app.get("/api/users", async (c) => {
-  const prisma = getPrisma(c);
-  const users = await prisma.user.findMany();
-  return c.json(users);
-});
-
-export default app;
 ```
 
-## Local Development
+## Available Scripts
 
-For local development, Wrangler will create a local D1 SQLite database for testing.
+- `npm run dev`: Generate Prisma client
+- `npm run build`: Generate Prisma client
+- `npm run migrate:create`: Create a new D1 migration
+- `npm run migrate:apply:local`: Apply migrations to local D1 database
+- `npm run migrate:apply:remote`: Apply migrations to remote D1 database
+- `npm run generate:types`: Generate Cloudflare Worker types
 
-```bash
-# In the backend package
-pnpm dev
-```
+## Models
 
-This will start the Wrangler dev server with a local D1 instance.
+The database schema includes the following models:
 
-## Migrations
-
-When you need to update your schema:
-
-1. Modify the schema.prisma file
-2. Run migration:
-   ```bash
-   pnpm migrate:dev
-   ```
-3. Push the changes to D1:
-   ```bash
-   wrangler d1 execute ai_brainstorm --file=./prisma/migrations/[latest]/migration.sql
-   ```
-
-## Prisma Studio
-
-You can use Prisma Studio to view and edit your local data:
-
-```bash
-pnpm studio
-```
-
-Note: This will connect to the local SQLite database, not your Cloudflare D1 instance.
+- `User`: Application users
+- `Session`: Brainstorming sessions
+- `Idea`: Individual ideas within a session
+- `Category`: Grouping categories for ideas

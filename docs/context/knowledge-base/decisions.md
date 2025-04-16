@@ -60,6 +60,42 @@ This document tracks quick decisions made during development that don't warrant 
 | 2023-08-28 | Use React Testing Library | Test behaviors, not implementation | Enzyme                 | More maintainable tests          |
 | 2023-08-28 | Mock AI services in tests | Predictable test environment       | Real API calls         | Faster, more reliable tests      |
 
+## 2024-04-29: Database Implementation with Prisma and Cloudflare D1
+
+**Decision**: Use Prisma ORM with the D1 driver adapter for database access
+
+**Context**:
+
+- We need a database solution compatible with Cloudflare Workers
+- We want type-safe database access with good developer experience
+- We want to use a modern ORM that supports migrations and schema management
+
+**Alternatives Considered**:
+
+1. Direct D1 SQL queries
+2. Drizzle ORM
+3. TypeORM (limited support for edge)
+
+**Reasons for Choice**:
+
+- Prisma provides excellent TypeScript integration and type safety
+- The D1 adapter allows seamless integration with Cloudflare Workers
+- Prisma's schema-first approach aligns with our development philosophy
+- Migrations can be managed using standard D1 migration tools
+
+**Implementation Notes**:
+
+- Created a separate `database` package in the monorepo
+- Used the SQLite dialect for D1 compatibility
+- Implemented a client factory function for use in Workers
+- Created SQL migrations that can be applied with Wrangler
+
+**Limitations/Risks**:
+
+- Driver adapter for D1 is relatively new and may have limitations
+- Need to maintain separate SQL migrations instead of using Prisma Migrate directly
+- SQLite dialect limitations compared to PostgreSQL
+
 ---
 
 _Last updated: 2025-04-15_

@@ -16,8 +16,12 @@
     "paths": {
       "@ai-brainstorm/ui/*": ["packages/ui/src/*"],
       "@ai-brainstorm/types/*": ["packages/types/src/*"],
-      "@ai-brainstorm/config/*": ["packages/config/*"]
+      "@ai-brainstorm/config/*": ["packages/config/*"],
+      "@ai-brainstorm/database": ["packages/database/src"],
+      "@ai-brainstorm/database/*": ["packages/database/src/*"],
+      "@ai-brainstorm/backend": ["packages/backend/src"],
+      "@ai-brainstorm/backend/*": ["packages/backend/src/*"]
     }
   },
   "exclude": ["node_modules"]
-} 
+}

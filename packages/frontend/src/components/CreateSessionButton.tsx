@@ -2,7 +2,13 @@ import React from "react";
 import { useSessionStore } from "../stores/sessionStore";
 import { CreateSession } from "@ai-brainstorm/types";
 
-export const CreateSessionButton: React.FC = () => {
+interface CreateSessionButtonProps {
+  onSessionCreated?: () => void;
+}
+
+export const CreateSessionButton: React.FC<CreateSessionButtonProps> = ({
+  onSessionCreated,
+}) => {
   const createSession = useSessionStore((state) => state.createSession);
   const isLoading = useSessionStore((state) => state.isLoading);
   const error = useSessionStore((state) => state.error);
@@ -16,7 +22,13 @@ export const CreateSessionButton: React.FC = () => {
       ownerId: "00000000-0000-0000-0000-000000000000", // Valid UUID placeholder
       isPublic: false, // Required by type, defaults to false
     };
-    await createSession(sessionData);
+
+    const success = await createSession(sessionData);
+
+    // Call the callback if provided and the session was created successfully
+    if (success && onSessionCreated) {
+      onSessionCreated();
+    }
   };
 
   return (

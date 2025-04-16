@@ -1,48 +1,28 @@
 # Current Focus
 
-This document describes what's currently being worked on in the AI Brainstorm project.
+## Completed
 
-## Active Development
+- ✅ Implement repository pattern for database access
+- ✅ Created UserRepository, SessionRepository, IdeaRepository, and CategoryRepository
+- ✅ Handled special case for Idea.position field (JSON serialization)
+- ✅ Added migration for schema updates
+- ✅ Created documentation for repository usage
 
-**Phase 2: Core Features & Deployment**
+## Current Focus
 
-We have completed Phase 1 (project setup, infrastructure, and CI/CD). The current focus is on core feature development and enhancing deployment workflows.
+- 🔄 Implement API endpoints for all models in the backend
+  - Endpoint implementation for Session, Idea, and Category
+  - Integration with repositories
+  - Validation using schemas from types package
 
-### Recently Completed
+## Planned Next
 
-- ✅ Project documentation and context tracking
-- ✅ Monorepo setup with pnpm workspaces
-- ✅ Shared types package with Zod schemas
-- ✅ Frontend and backend initialization
-- ✅ Database schema and integration
-- ✅ CI/CD pipeline (GitHub Actions for lint, type-check, test; all packages pass in CI)
+- Add unit tests for repositories and API endpoints
+- Implement session creation and management in frontend
+- Set up database migrations in the deployment pipeline
 
-### In Progress
+## Blockers
 
-- Implement core brainstorming session functionality (CRUD, UI, API)
-- Implement basic idea management (add, edit, delete, categorize)
-- Enhance CI/CD with deployment workflows (Cloudflare Pages, Workers)
+- None currently
 
-### Up Next
-
-- Add deployment status badge to README
-- Document environment variable setup for CI/CD
-- Begin AI service integration (OpenAI API, prompt templates)
-
-## Current Sprint Goals
-
-1. Implement core session and idea management features
-2. Enhance CI/CD with deployment workflows
-3. Prepare for AI service integration
-
-## Technical Focus Areas
-
-- **Frontend**: Session/idea management UI, state management
-- **Backend**: API endpoints for sessions/ideas, validation
-- **CI/CD**: Deployment automation, environment config
-- **AI**: Service abstraction, prompt design (upcoming)
-
-## Roles and Responsibilities
-
-- **AI Assistant**: Supporting code generation, documentation, and implementation guidance
-- **Human Developer**: Making key decisions, reviewing generated code, and ensuring proper integration
+_Last updated: 2025-04-30_

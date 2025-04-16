@@ -7,7 +7,7 @@ interface SessionState {
   isLoading: boolean;
   error: string | null;
   fetchSessions: () => Promise<void>;
-  createSession: (sessionData: CreateSession) => Promise<void>;
+  createSession: (sessionData: CreateSession) => Promise<boolean>;
   // TODO: Add getSession, updateSession, deleteSession actions
 }
 
@@ -64,6 +64,7 @@ const sessionStoreCreator: StateCreator<SessionState> = (set) => ({
         isLoading: false,
       }));
       console.log("Session created:", newSession);
+      return true; // Return success
     } catch (error) {
       console.error("Create session error:", error);
       set({
@@ -73,6 +74,7 @@ const sessionStoreCreator: StateCreator<SessionState> = (set) => ({
             : "An unknown error occurred during creation",
         isLoading: false,
       });
+      return false; // Return failure
     }
   },
 });
