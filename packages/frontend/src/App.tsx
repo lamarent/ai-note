@@ -1,42 +1,34 @@
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import SessionsList from "./components/SessionsList";
-import SessionPage from "./components/SessionPage";
-import SessionManager from "./components/SessionManager";
+import React from "react";
+import { BrowserRouter, useRoutes } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import routes from "./routes";
 
-const HomePage = () => {
-  return (
-    <div className="container mx-auto p-4 max-w-4xl">
-      <SessionManager />
-    </div>
-  );
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    },
+  },
+});
+
+// App Router component that uses the routes configuration
+const AppRouter = () => {
+  const element = useRoutes(routes);
+  return element;
 };
 
-const App = () => {
+const App: React.FC = () => {
   return (
-    <BrowserRouter>
-      <div className="min-h-screen bg-gray-100">
-        <header className="bg-blue-600 text-white p-4">
-          <div className="container mx-auto">
-            <Link to="/" className="text-xl font-bold">
-              AI Brainstorm
-            </Link>
-          </div>
-        </header>
-
-        <main className="py-6">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/sessions/:sessionId" element={<SessionPage />} />
-          </Routes>
-        </main>
-
-        <footer className="bg-gray-200 p-4 text-center text-gray-600">
-          <div className="container mx-auto">
-            <p>&copy; {new Date().getFullYear()} AI Brainstorm</p>
-          </div>
-        </footer>
-      </div>
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AppRouter />
+      </BrowserRouter>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   );
 };
 

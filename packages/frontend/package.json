@@ -13,6 +13,7 @@
     "@ai-brainstorm/types": "workspace:*",
     "@tanstack/react-query": "^5.74.3",
     "@tanstack/react-query-devtools": "^5.74.3",
+    "date-fns": "^4.1.0",
     "hono": "^4.7.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

@@ -35,6 +35,9 @@ jobs:
         run: pnpm install --frozen-lockfile
         working-directory: ./packages/backend
 
+      - name: Build types package
+        run: pnpm --filter @ai-brainstorm/types build
+
       - name: Build backend
         run: pnpm --filter backend build
 
