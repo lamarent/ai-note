@@ -1,7 +1,7 @@
 import React from "react";
 import Card from "../common/Card";
 import Button from "../common/Button";
-import { Idea } from "../../services/api/ideaApi";
+import { Idea } from "@ai-brainstorm/types";
 
 interface IdeaCardProps {
   idea: Idea;

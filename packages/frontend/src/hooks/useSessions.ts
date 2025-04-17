@@ -10,21 +10,6 @@ import { ApiResponse, ApiError } from "../services/api/config";
 import { sessionApi } from "../services/api/sessionApi";
 import { Session, CreateSession, UpdateSession } from "@ai-brainstorm/types";
 
-export interface CreateSessionData {
-  title: string;
-  description?: string;
-  ownerId: string;
-  collaborators?: string[];
-  isPublic?: boolean;
-}
-
-export interface UpdateSessionData {
-  title?: string;
-  description?: string;
-  collaborators?: string[];
-  isPublic?: boolean;
-}
-
 // Define query keys
 const SESSION_KEYS = {
   all: ["sessions"] as const,
@@ -124,11 +109,13 @@ export const useCreateSession = (
     mutationFn: (data: CreateSession) =>
       handleApiResponse(sessionApi.create(data)),
     onSuccess: (newSession, variables, context) => {
-      queryClient.invalidateQueries({ queryKey: SESSION_KEYS.lists() });
-      queryClient.invalidateQueries({
-        queryKey: SESSION_KEYS.byOwner(newSession.ownerId),
-      });
+      console.log("newSession", newSession);
       options?.onSuccess?.(newSession, variables, context);
+    },
+    onSettled: () => {
+      // Force refetch sessions list
+      queryClient.invalidateQueries({ queryKey: SESSION_KEYS.lists() });
+      queryClient.refetchQueries({ queryKey: SESSION_KEYS.lists() });
     },
     ...options,
   });
@@ -148,7 +135,7 @@ export const useUpdateSession = (
     mutationFn: ({ id, data }: { id: string; data: UpdateSession }) =>
       handleApiResponse(sessionApi.update(id, data)),
     onSuccess: (updatedSession, variables, context) => {
-      queryClient.invalidateQueries({ queryKey: SESSION_KEYS.all });
+      // Only do the optimistic update here
       queryClient.setQueryData<Session[] | undefined>(
         SESSION_KEYS.lists(),
         (oldData) =>
@@ -160,7 +147,22 @@ export const useUpdateSession = (
         SESSION_KEYS.detail(variables.id),
         updatedSession
       );
+
       options?.onSuccess?.(updatedSession, variables, context);
+    },
+    onSettled: (data, error, variables) => {
+      // Force refetch regardless of outcome
+      queryClient.invalidateQueries({
+        queryKey: SESSION_KEYS.detail(variables.id),
+      });
+      queryClient.invalidateQueries({ queryKey: SESSION_KEYS.lists() });
+      queryClient.refetchQueries({ queryKey: SESSION_KEYS.lists() });
+
+      if (data?.ownerId) {
+        queryClient.invalidateQueries({
+          queryKey: SESSION_KEYS.byOwner(data.ownerId),
+        });
+      }
     },
     ...options,
   });
@@ -175,8 +177,13 @@ export const useDeleteSession = (
   return useMutation<void, ApiError, string>({
     mutationFn: (id: string) => handleApiResponse(sessionApi.delete(id)),
     onSuccess: (data, id, context) => {
-      queryClient.invalidateQueries({ queryKey: SESSION_KEYS.all });
       options?.onSuccess?.(data, id, context);
+    },
+    onSettled: (data, error, id) => {
+      // Force remove and invalidate
+      queryClient.removeQueries({ queryKey: SESSION_KEYS.detail(id) });
+      queryClient.invalidateQueries({ queryKey: SESSION_KEYS.lists() });
+      queryClient.refetchQueries({ queryKey: SESSION_KEYS.lists() });
     },
     ...options,
   });

@@ -8,7 +8,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({
   title = "AI Brainstorm",
-  showNavigation = true,
+  showNavigation = false,
 }) => {
   return (
     <div className="navbar bg-base-100 shadow-md">

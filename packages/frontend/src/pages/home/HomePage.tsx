@@ -1,13 +1,17 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import Layout from "../../components/layout/Layout";
+// import Layout from "../../components/layout/Layout"; // Layout wraps at App level
+import Header from "../../components/layout/Header"; // Import Header
 import Button from "../../components/common/Button";
 import Card from "../../components/common/Card";
 
 const HomePage: React.FC = () => {
   return (
-    <Layout>
-      <div className="container mx-auto px-4">
+    <>
+      <Header title="AI Brainstorm - Home" /> {/* Add Header */}
+      <div className="container mx-auto px-4 py-6">
+        {" "}
+        {/* Add padding consistent with old Layout main area */}
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
@@ -58,7 +62,7 @@ const HomePage: React.FC = () => {
           </Card>
         </div>
       </div>
-    </Layout>
+    </>
   );
 };
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Button from "../common/Button";
-import { Idea } from "../../services/api/ideaApi";
+import { Idea } from "@ai-brainstorm/types";
 
 interface IdeaFormProps {
   initialIdea?: Partial<Idea>;

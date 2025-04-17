@@ -5,7 +5,6 @@ export const IdeaSchema = z.object({
   content: z.string().min(1).max(1000),
   sessionId: z.string().uuid(),
   categoryId: z.string().uuid().optional(),
-  createdBy: z.string().uuid(),
   upvotes: z.number().int().nonnegative().default(0),
   position: z
     .object({

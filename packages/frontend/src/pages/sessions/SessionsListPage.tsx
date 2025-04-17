@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import Layout from "../../components/layout/Layout";
 import Button from "../../components/common/Button";
 import Card from "../../components/common/Card";
 import Modal from "../../components/common/Modal";
@@ -11,6 +10,7 @@ import {
   useDeleteSession,
 } from "../../hooks/useSessions";
 import { format } from "date-fns";
+import Header from "../../components/layout/Header";
 
 const SessionsListPage: React.FC = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -30,6 +30,8 @@ const SessionsListPage: React.FC = () => {
   // Create session mutation
   const createSession = useCreateSession({
     onSuccess: () => {
+      console.log("createSession success");
+
       setFormData({ title: "", description: "", isPublic: true });
       setIsCreateModalOpen(false);
     },
@@ -77,12 +79,11 @@ const SessionsListPage: React.FC = () => {
   };
 
   return (
-    <Layout>
-      <div className="container mx-auto px-4">
+    <>
+      <Header title="Sessions" />
+      <div className="container mx-auto px-4 py-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">
-            Brainstorming Sessions
-          </h1>
+          <h1 className="text-3xl font-bold">Sessions</h1>
 
           <Button
             onClick={() => setIsCreateModalOpen(true)}
@@ -282,7 +283,7 @@ const SessionsListPage: React.FC = () => {
           )}
         </Modal>
       </div>
-    </Layout>
+    </>
   );
 };
 

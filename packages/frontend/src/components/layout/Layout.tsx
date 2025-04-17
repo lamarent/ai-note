@@ -1,32 +1,21 @@
 import React from "react";
 import Sidebar from "./Sidebar";
-import Header from "./Header";
 import Footer from "./Footer";
 
 interface LayoutProps {
   children: React.ReactNode;
-  showNavigation?: boolean;
   showFooter?: boolean;
 }
 
-const Layout: React.FC<LayoutProps> = ({
-  children,
-  showNavigation = true,
-  showFooter = true,
-}) => {
+const Layout: React.FC<LayoutProps> = ({ children, showFooter = true }) => {
   return (
     <div className="flex">
       <Sidebar />
-      <main className="flex-1 ml-64 p-4">
-        <Header showNavigation={showNavigation} />
-        <div className="min-h-screen flex flex-col bg-base-100">
-          <main className="flex-grow container mx-auto px-4 py-6">
-            {children}
-          </main>
+      <div className="flex-1 ml-64 flex flex-col min-h-screen bg-base-100">
+        <div className="flex-grow container mx-auto px-4 py-6">{children}</div>
 
-          {showFooter && <Footer />}
-        </div>
-      </main>
+        {showFooter && <Footer />}
+      </div>
     </div>
   );
 };

@@ -6,7 +6,10 @@ import {
   useUpdateIdea,
 } from "../../hooks";
 import Button from "../common/Button";
-import { CreateIdea, UpdateIdea } from "@ai-brainstorm/types";
+import { Idea } from "@ai-brainstorm/types";
+import Modal from "../common/Modal";
+import IdeaForm from "./IdeaForm";
+import IdeaCard from "./IdeaCard";
 
 interface IdeasListProps {
   sessionId: string;
@@ -23,61 +26,25 @@ export default function IdeasList({ sessionId }: IdeasListProps) {
   const updateIdeaMutation = useUpdateIdea();
   const deleteIdeaMutation = useDeleteIdea();
 
-  const [newIdeaContent, setNewIdeaContent] = useState("");
   const [editingIdeaId, setEditingIdeaId] = useState<string | null>(null);
-  const [editContent, setEditContent] = useState("");
+  const [deleteModalIdeaId, setDeleteModalIdeaId] = useState<string | null>(
+    null
+  );
 
-  const handleCreateIdea = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newIdeaContent.trim()) return;
-
-    const newIdea: CreateIdea = {
-      content: newIdeaContent.trim(),
-      sessionId,
-      createdBy: userId,
-    };
-
-    createIdeaMutation.mutate(newIdea, {
-      onSuccess: () => {
-        setNewIdeaContent("");
-      },
-    });
+  const handleEditSubmit = (data: { content: string; categoryId?: string }) => {
+    if (editingIdeaId) {
+      updateIdeaMutation.mutate(
+        { id: editingIdeaId, data },
+        { onSuccess: () => setEditingIdeaId(null) }
+      );
+    }
   };
 
-  const startEditing = (id: string, content: string) => {
-    setEditingIdeaId(id);
-    setEditContent(content);
-  };
-
-  const cancelEditing = () => {
-    setEditingIdeaId(null);
-    setEditContent("");
-  };
-
-  const handleUpdateIdea = (id: string) => {
-    if (!editContent.trim()) return;
-
-    const updatedIdea: UpdateIdea = {
-      content: editContent.trim(),
-    };
-
-    updateIdeaMutation.mutate(
-      {
-        id,
-        data: updatedIdea,
-      },
-      {
-        onSuccess: () => {
-          setEditingIdeaId(null);
-          setEditContent("");
-        },
-      }
-    );
-  };
-
-  const handleDeleteIdea = (id: string) => {
-    if (window.confirm("Are you sure you want to delete this idea?")) {
-      deleteIdeaMutation.mutate(id);
+  const handleDeleteConfirm = () => {
+    if (deleteModalIdeaId) {
+      deleteIdeaMutation.mutate(deleteModalIdeaId, {
+        onSuccess: () => setDeleteModalIdeaId(null),
+      });
     }
   };
 
@@ -112,93 +79,81 @@ export default function IdeasList({ sessionId }: IdeasListProps) {
     );
 
   return (
-    <div className="mt-6 space-y-6">
-      <h2 className="text-xl font-bold mb-4">Ideas</h2>
+    <div className="mt-6">
+      <IdeaForm
+        initialIdea={{}}
+        onSubmit={(data) =>
+          createIdeaMutation.mutate(
+            {
+              ...data,
+              sessionId,
+            },
+            { onSuccess: () => {} }
+          )
+        }
+        onCancel={() => {}}
+        isLoading={createIdeaMutation.isPending}
+        error={createIdeaMutation.error?.message}
+      />
 
-      <form onSubmit={handleCreateIdea} className="mb-6">
-        <div className="join w-full">
-          <input
-            type="text"
-            value={newIdeaContent}
-            onChange={(e) => setNewIdeaContent(e.target.value)}
-            placeholder="Add a new idea..."
-            className="input input-bordered join-item flex-grow"
-            required
-            disabled={createIdeaMutation.isPending}
-          />
-          <Button
-            type="submit"
-            className="join-item"
-            variant="primary"
-            isLoading={createIdeaMutation.isPending}
-            disabled={createIdeaMutation.isPending || !newIdeaContent.trim()}
-          >
-            {createIdeaMutation.isPending ? "Adding..." : "Add"}
-          </Button>
-        </div>
-      </form>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold">Ideas ({ideas.length})</h2>
+      </div>
 
-      {ideas.length === 0 ? (
-        <p className="text-base-content italic">
-          No ideas yet. Add your first idea above!
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {ideas.map((idea) =>
+          editingIdeaId === idea.id ? (
+            <IdeaForm
+              key={idea.id}
+              initialIdea={idea}
+              onSubmit={handleEditSubmit}
+              onCancel={() => setEditingIdeaId(null)}
+              isLoading={updateIdeaMutation.isPending}
+              error={updateIdeaMutation.error?.message}
+            />
+          ) : (
+            <IdeaCard
+              key={idea.id}
+              idea={idea as Idea}
+              onEdit={() => setEditingIdeaId(idea.id)}
+              onDelete={(ideaToDelete) => setDeleteModalIdeaId(ideaToDelete.id)}
+            />
+          )
+        )}
+      </div>
+
+      <Modal
+        isOpen={!!deleteModalIdeaId}
+        onClose={() => setDeleteModalIdeaId(null)}
+        title="Delete Idea"
+        footer={
+          <>
+            <Button
+              variant="secondary"
+              onClick={() => setDeleteModalIdeaId(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              onClick={handleDeleteConfirm}
+              isLoading={deleteIdeaMutation.isPending}
+            >
+              Delete
+            </Button>
+          </>
+        }
+      >
+        <p>
+          Are you sure you want to delete this idea? This action cannot be
+          undone.
         </p>
-      ) : (
-        <ul className="space-y-4">
-          {ideas.map((idea) => (
-            <li key={idea.id} className="p-4 rounded-md bg-base-200 shadow-sm">
-              {editingIdeaId === idea.id ? (
-                <div className="space-y-2">
-                  <textarea
-                    value={editContent}
-                    onChange={(e) => setEditContent(e.target.value)}
-                    className="textarea textarea-bordered w-full"
-                    rows={3}
-                  />
-                  <div className="flex space-x-2 justify-end">
-                    <Button
-                      onClick={() => handleUpdateIdea(idea.id)}
-                      isLoading={updateIdeaMutation.isPending}
-                      disabled={
-                        updateIdeaMutation.isPending || !editContent.trim()
-                      }
-                      variant="primary"
-                      size="sm"
-                    >
-                      Save
-                    </Button>
-                    <Button onClick={cancelEditing} variant="ghost" size="sm">
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div>
-                  <p className="text-base-content mb-2">{idea.content}</p>
-                  <div className="flex justify-end space-x-2">
-                    <Button
-                      onClick={() => startEditing(idea.id, idea.content)}
-                      variant="ghost"
-                      size="sm"
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      onClick={() => handleDeleteIdea(idea.id)}
-                      isLoading={deleteIdeaMutation.isPending}
-                      variant="ghost"
-                      size="sm"
-                      className="text-error"
-                      disabled={deleteIdeaMutation.isPending}
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
+        {deleteIdeaMutation.isError && (
+          <div className="mt-4 text-red-600 text-sm">
+            {deleteIdeaMutation.error?.message}
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

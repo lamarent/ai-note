@@ -360,4 +360,15 @@ The API now follows a clean layered architecture:
 - Cleaned up deprecated files and fixed import paths.
 - Ran linter and resolved errors across services and hooks.
 
+## 2023-12-29
+
+- **Refactor: Header Layout**
+  - Removed Header from main Layout.
+  - Added Header to HomePage, SessionsListPage, SessionDetailPage.
+  - Context: `docs/context/refactor-header-layout.md`
+- **Feature: Idea Management (Initial Check & Refinement)**
+  - Created plan: `docs/context/plan-idea-management.md`.
+  - Verified existing hooks (`useIdeas.ts`) and components (`IdeasList`, `IdeaForm`, `IdeaItem`, `IdeaCard`) cover basic CRUD.
+  - Refined `IdeasList.tsx` to use `IdeaCard` instead of `IdeaItem` for visual consistency.
+
 _Last updated: 2025-04-17_

@@ -15,6 +15,7 @@
     "baseUrl": ".",
     "paths": {
       "@ai-brainstorm/ui/*": ["packages/ui/src/*"],
+      "@ai-brainstorm/types": ["packages/types/src"],
       "@ai-brainstorm/types/*": ["packages/types/src/*"],
       "@ai-brainstorm/config/*": ["packages/config/*"],
       "@ai-brainstorm/database": ["packages/database/src"],

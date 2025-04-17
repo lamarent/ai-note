@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import Layout from "../../components/layout/Layout";
+import Header from "../../components/layout/Header";
 import Button from "../../components/common/Button";
 import Card from "../../components/common/Card";
 import Modal from "../../components/common/Modal";
@@ -12,6 +12,67 @@ import {
   useDeleteSession,
 } from "../../hooks/useSessions";
 import { format } from "date-fns";
+
+// Extracted SessionHeader component to simplify header rendering
+interface SessionHeaderProps {
+  title: string;
+  onEdit: () => void;
+  onDelete: () => void;
+}
+const SessionHeader: React.FC<SessionHeaderProps> = ({
+  title,
+  onEdit,
+  onDelete,
+}) => (
+  <div className="flex justify-between items-center mb-6">
+    <h1 className="text-2xl font-bold text-gray-800">{title}</h1>
+    <div className="flex space-x-2">
+      <Button variant="secondary" onClick={onEdit} aria-label="Edit session">
+        Edit
+      </Button>
+      <Button variant="danger" onClick={onDelete} aria-label="Delete session">
+        Delete
+      </Button>
+    </div>
+  </div>
+);
+
+// Extracted SessionMetadata component to focus on description and dates
+interface SessionMetadataProps {
+  description?: string;
+  isPublic: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+const SessionMetadata: React.FC<SessionMetadataProps> = ({
+  description,
+  isPublic,
+  createdAt,
+  updatedAt,
+}) => (
+  <Card className="mb-6">
+    <div className="mb-4">
+      <h2 className="text-lg font-medium text-gray-700 mb-2">Description</h2>
+      <p className="text-gray-600">
+        {description || "No description provided."}
+      </p>
+    </div>
+    <div className="flex justify-between text-sm text-gray-500 border-t border-gray-200 pt-4 mt-4">
+      <div>
+        <span className="font-medium">Status:</span>{" "}
+        {isPublic ? "Public" : "Private"}
+      </div>
+      <div>
+        <span className="font-medium">Created:</span>{" "}
+        {format(createdAt, "MMM d, yyyy")}
+      </div>
+      <div>
+        <span className="font-medium">Last Updated:</span>{" "}
+        {format(updatedAt, "MMM d, yyyy")}
+      </div>
+    </div>
+  </Card>
+);
 
 const SessionDetailPage: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -32,12 +93,15 @@ const SessionDetailPage: React.FC = () => {
     isError,
   } = useGetSessionById(sessionId || "");
 
+  // Tab state for switching panels
+  const [activeTab, setActiveTab] = useState<"ideas" | "ai">("ideas");
+
   // Update form data when session data is loaded
   useEffect(() => {
     if (session) {
       setFormData({
         title: session.title,
-        description: session.description,
+        description: session.description ?? "",
         isPublic: session.isPublic,
       });
     }
@@ -88,25 +152,29 @@ const SessionDetailPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <Layout>
-        <div className="container mx-auto px-4">
+      <>
+        <Header title="Loading Session..." />
+        <div className="container mx-auto px-4 py-6">
           <div className="flex justify-center py-8">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
           </div>
         </div>
-      </Layout>
+      </>
     );
   }
 
   if (isError || !session) {
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "Session not found or unknown error";
     return (
-      <Layout>
-        <div className="container mx-auto px-4">
+      <>
+        <Header title="Error" />
+        <div className="container mx-auto px-4 py-6">
           <Card className="bg-red-50 border border-red-200 mb-6">
             <div className="text-red-600">
-              <p>
-                Error loading session: {error?.message || "Session not found"}
-              </p>
+              <p>Error loading session: {errorMessage}</p>
               <Button
                 variant="secondary"
                 className="mt-4"
@@ -117,87 +185,62 @@ const SessionDetailPage: React.FC = () => {
             </div>
           </Card>
         </div>
-      </Layout>
+      </>
     );
   }
 
   return (
-    <Layout>
-      <div className="container mx-auto px-4">
+    <>
+      <Header title={session.title || "Session Detail"} />
+      <div className="container mx-auto px-4 py-6">
         <div className="max-w-4xl mx-auto">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-800">
-              {session.title}
-            </h1>
-
-            <div className="flex space-x-2">
-              <Button
-                variant="secondary"
-                onClick={() => setIsEditModalOpen(true)}
-                leftIcon={
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                  </svg>
-                }
-              >
-                Edit
-              </Button>
-              <Button
-                variant="danger"
-                onClick={handleDeleteClick}
-                leftIcon={
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                }
-              >
-                Delete
-              </Button>
-            </div>
+          <SessionHeader
+            title={session.title}
+            onEdit={() => setIsEditModalOpen(true)}
+            onDelete={handleDeleteClick}
+          />
+          <SessionMetadata
+            description={session.description}
+            isPublic={session.isPublic}
+            createdAt={new Date(session.createdAt)}
+            updatedAt={new Date(session.updatedAt)}
+          />
+          {/* Tabs for navigation */}
+          <div className="tabs mb-6" role="tablist">
+            <button
+              className={`tab ${activeTab === "ideas" ? "tab-active" : ""}`}
+              role="tab"
+              aria-selected={activeTab === "ideas"}
+              aria-controls="ideas-panel"
+              onClick={() => setActiveTab("ideas")}
+            >
+              Ideas
+            </button>
+            <button
+              className={`tab ${activeTab === "ai" ? "tab-active" : ""}`}
+              role="tab"
+              aria-selected={activeTab === "ai"}
+              aria-controls="ai-panel"
+              onClick={() => setActiveTab("ai")}
+            >
+              AI Suggestions
+            </button>
           </div>
-
-          <Card className="mb-6">
-            <div className="mb-4">
-              <h2 className="text-lg font-medium text-gray-700 mb-2">
-                Description
-              </h2>
-              <p className="text-gray-600">
-                {session.description || "No description provided."}
+          {/* Panel content */}
+          {activeTab === "ideas" ? (
+            <div id="ideas-panel" role="tabpanel">
+              <div className="mb-6">
+                <IdeasList sessionId={session.id} />
+              </div>
+            </div>
+          ) : (
+            <div id="ai-panel" role="tabpanel" className="mb-6">
+              {/* Placeholder for AI-powered idea suggestions */}
+              <p className="text-gray-600 italic">
+                AI-powered suggestions will appear here.
               </p>
             </div>
-
-            <div className="flex justify-between text-sm text-gray-500 border-t border-gray-200 pt-4 mt-4">
-              <div>
-                <span className="font-medium">Status:</span>{" "}
-                {session.isPublic ? "Public" : "Private"}
-              </div>
-              <div>
-                <span className="font-medium">Created:</span>{" "}
-                {format(new Date(session.createdAt), "MMM d, yyyy")}
-              </div>
-              <div>
-                <span className="font-medium">Last Updated:</span>{" "}
-                {format(new Date(session.updatedAt), "MMM d, yyyy")}
-              </div>
-            </div>
-          </Card>
-
-          {/* Ideas List */}
-          {sessionId && <IdeasList sessionId={sessionId} className="mb-6" />}
+          )}
 
           {/* Edit Session Modal */}
           <Modal
@@ -315,7 +358,7 @@ const SessionDetailPage: React.FC = () => {
           </Modal>
         </div>
       </div>
-    </Layout>
+    </>
   );
 };
 
