@@ -29,6 +29,7 @@ model Session {
   collaborators User[]     @relation("SessionCollaborators")
   ideas         Idea[]
   categories    Category[]
+  isPublic      Boolean    @default(false)
 }
 
 model Idea {

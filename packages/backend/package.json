@@ -13,14 +13,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@ai-brainstorm/types": "workspace:*",
     "@ai-brainstorm/database": "workspace:*",
+    "@ai-brainstorm/types": "workspace:*",
     "@hono/zod-validator": "^0.4.3",
     "@prisma/client": "^6.6.0",
     "hono": "^4.7.7"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250416.0",
+    "@cloudflare/workers-types": "^4.20250417.0",
     "@types/node": "^20.14.2",
     "typescript": "^5.8.3",
     "wrangler": "^4.11.0"

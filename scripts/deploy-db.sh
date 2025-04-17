@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+# Always run from the monorepo root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$SCRIPT_DIR/.."
+cd "$REPO_ROOT"
+
 # This script handles database setup and migrations for production deployment
 
 echo "Starting database deployment process..."

@@ -15,6 +15,7 @@ CREATE TABLE "Session" (
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
     "ownerId" TEXT NOT NULL,
+    "isPublic" BOOLEAN NOT NULL DEFAULT false,
     CONSTRAINT "Session_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 

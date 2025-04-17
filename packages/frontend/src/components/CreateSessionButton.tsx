@@ -1,5 +1,6 @@
 import React from "react";
 import { useSessionStore } from "../stores/sessionStore";
+import { CreateSession } from "@ai-brainstorm/types";
 
 interface CreateSessionButtonProps {
   onSessionCreated?: () => void;

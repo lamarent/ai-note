@@ -20,9 +20,10 @@ port = 8787
 [[d1_databases]]
 binding = "DB"
 database_name = "ai_brainstorm"
-database_id = "ai_brainstorm_db" # Replace with actual ID after creating the database
-migrations_dir = "../database/prisma/migrations"
+database_id = "f43aa6d1-c602-4b9c-838d-0cc94d7f6e1f" 
+migrations_dir = "../database/migrations"
 migrations_table = "prisma_migrations"
+
 
 # [triggers]
 # crons = [ ]
