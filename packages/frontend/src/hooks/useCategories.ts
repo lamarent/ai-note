@@ -1,11 +1,28 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  categoryApi,
-  CreateCategoryData,
-  UpdateCategoryData,
-  Category,
-} from "../api";
+import { apiConfig, ApiResponse } from "../api/config";
 import { IDEA_KEYS } from "./useIdeas";
+
+// Moved types from categoryApi.ts
+export interface Category {
+  id: string;
+  name: string;
+  color: string;
+  sessionId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateCategoryData {
+  name: string;
+  color: string;
+  sessionId: string;
+}
+
+export interface UpdateCategoryData {
+  name?: string;
+  color?: string;
+}
+// End of moved types
 
 // Query keys
 export const CATEGORY_KEYS = {
@@ -26,7 +43,7 @@ export function useCategories() {
   return useQuery({
     queryKey: CATEGORY_KEYS.lists(),
     queryFn: async () => {
-      const response = await categoryApi.getCategories();
+      const response = await apiConfig.get<Category[]>("/categories");
       if (!response.success) {
         throw new Error(response.error || "Failed to fetch categories");
       }
@@ -42,7 +59,7 @@ export function useCategory(id: string) {
   return useQuery({
     queryKey: CATEGORY_KEYS.detail(id),
     queryFn: async () => {
-      const response = await categoryApi.getCategory(id);
+      const response = await apiConfig.get<Category>(`/categories/${id}`);
       if (!response.success) {
         throw new Error(response.error || "Failed to fetch category");
       }
@@ -60,7 +77,7 @@ export function useCreateCategory() {
 
   return useMutation({
     mutationFn: async (data: CreateCategoryData) => {
-      const response = await categoryApi.createCategory(data);
+      const response = await apiConfig.post<Category>("/categories", data);
       if (!response.success) {
         throw new Error(response.error || "Failed to create category");
       }
@@ -88,7 +105,7 @@ export function useUpdateCategory(id: string) {
 
   return useMutation({
     mutationFn: async (data: UpdateCategoryData) => {
-      const response = await categoryApi.updateCategory(id, data);
+      const response = await apiConfig.put<Category>(`/categories/${id}`, data);
       if (!response.success) {
         throw new Error(response.error || "Failed to update category");
       }
@@ -125,10 +142,21 @@ export function useDeleteCategory() {
   return useMutation({
     mutationFn: async (id: string) => {
       // Get the category first to know its session for cache invalidation
-      const categoryResponse = await categoryApi.getCategory(id);
-      const category = categoryResponse.data as Category;
+      const categoryResponse = await apiConfig.get<Category>(
+        `/categories/${id}`
+      );
+      const category = categoryResponse.data;
 
-      const response = await categoryApi.deleteCategory(id);
+      if (!categoryResponse.success || !category) {
+        console.warn(
+          `Failed to fetch category ${id} before deleting, cache invalidation for session might be incomplete.`
+        );
+        // Decide if we should throw or continue
+      }
+
+      const response = await apiConfig.delete<{ success: boolean }>(
+        `/categories/${id}`
+      );
       if (!response.success) {
         throw new Error(response.error || "Failed to delete category");
       }

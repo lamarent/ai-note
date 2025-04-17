@@ -1,37 +1,57 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-  useSession,
-  useSessionIdeas,
-  useCategories,
+  useGetSession,
+  useGetSessionIdeas,
+  useGetCategories,
   useCreateIdea,
   useUpdateIdea,
   useDeleteIdea,
   useCreateCategory,
   useUpdateCategory,
   useDeleteCategory,
-} from "../../hooks"; // Assuming hooks index
-import Button from "../common/Button"; // Import Button
-import { Idea, Category } from "../../api/types"; // Assuming types exist
-import Modal from "../common/Modal"; // Import Modal for confirmations/editing
+} from "../../api/hooks";
+// Import DndKit components and hooks
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy, // Using vertical list for now, can adapt later
+  rectSortingStrategy, // Strategy for grid layout
+} from "@dnd-kit/sortable";
+// Import CSS from utilities
+import { CSS } from "@dnd-kit/utilities";
+import Button from "../common/Button";
+// Import standardized types from api/*Api.ts files (adjust path if index.ts is used)
+import { Session } from "../../api/sessionApi";
+import {
+  Idea,
+  CreateIdeaData,
+  UpdateIdeaData,
+  Position,
+} from "../../api/ideaApi";
+import {
+  Category,
+  CreateCategoryData,
+  UpdateCategoryData,
+} from "../../api/categoryApi";
+import Modal from "../common/Modal";
 
-// Define interfaces locally if not imported
-interface CategoryFormData {
-  name: string;
-  color: string; // Keep color for now, map to DaisyUI colors later
-}
+// Local form state can use Partial of the create/update types
+// type CategoryFormData = Partial<CreateCategoryData>; // Example
+// type IdeaFormData = Partial<CreateIdeaData>; // Example
 
-interface IdeaFormData {
-  content: string;
-  categoryId?: string;
-}
-
-interface Position {
-  x: number;
-  y: number;
-}
-
-// Map string colors to DaisyUI theme colors or keep as class names
+// Color mapping remains useful for UI
 const COLOR_MAP: Record<string, string> = {
   red: "error",
   blue: "primary",
@@ -39,68 +59,175 @@ const COLOR_MAP: Record<string, string> = {
   yellow: "warning",
   purple: "accent",
   teal: "info",
-  pink: "secondary", // Example mapping
-  orange: "warning", // Example mapping
+  pink: "secondary",
+  orange: "warning",
 };
-
 const COLORS = Object.entries(COLOR_MAP).map(([name, value]) => ({
   name: name.charAt(0).toUpperCase() + name.slice(1),
   value: name,
   daisyClass: value,
 }));
 
-const getDefaultPosition = (index: number): Position => {
-  const col = index % 3;
-  const row = Math.floor(index / 3);
-  return { x: 100 + col * 300, y: 100 + row * 150 };
+// Helper function to get default position (might need adjustment for DnD)
+const getDefaultPosition = (index: number, ideas: Idea[] = []): Position => {
+  // Find max Y position to place new items below existing ones
+  const maxY = ideas.reduce(
+    (max, idea) => Math.max(max, idea.position?.y || 0),
+    0
+  );
+  // Simple placement logic for now, adjust as needed
+  const col = index % 3; // Example: 3 columns
+  return { x: 50 + col * 320, y: maxY + 150 }; // Add below the max Y
 };
+
+// Sortable Idea Item Component
+interface SortableIdeaProps {
+  idea: Idea;
+  sessionCategories: Category[];
+  onEdit: (idea: Idea) => void;
+  onDelete: (id: string) => void;
+}
+
+function SortableIdea({
+  idea,
+  sessionCategories,
+  onEdit,
+  onDelete,
+}: SortableIdeaProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: idea.id });
+
+  // Explicitly type style as React.CSSProperties
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 10 : undefined, // Bring dragging item to front
+    opacity: isDragging ? 0.8 : 1,
+    position: "relative", // Needed for zIndex to work
+  };
+
+  // Find category details
+  const category = sessionCategories.find((c) => c.id === idea.categoryId);
+  const categoryColor = category?.color || "neutral";
+  const categoryBgClass = category
+    ? `bg-${COLOR_MAP[categoryColor] || "base"}-100`
+    : "bg-base-200";
+  const categoryBorderClass = category
+    ? `border-${COLOR_MAP[categoryColor] || "base"}-300`
+    : "border-base-300";
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className={`card ${categoryBgClass} border ${categoryBorderClass} shadow-sm`}
+    >
+      <div className="card-body p-4">
+        {category && (
+          <div
+            className={`badge badge-sm badge-${COLOR_MAP[category.color] || "neutral"} mb-2`}
+          >
+            {category.name}
+          </div>
+        )}
+        <p className="mb-3 text-base-content whitespace-pre-wrap">
+          {idea.content}
+        </p>
+        <div className="card-actions justify-between items-center text-sm text-base-content/70">
+          <span>Added {new Date(idea.createdAt).toLocaleDateString()}</span>
+          <div className="flex space-x-1">
+            {/* Disable edit/delete while dragging? Maybe not needed */}
+            <Button
+              size="xs"
+              ghost
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent drag start on button click
+                onEdit(idea);
+              }}
+            >
+              Edit
+            </Button>
+            <Button
+              size="xs"
+              ghost
+              className="text-error"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(idea.id);
+              }}
+            >
+              Delete
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const EnhancedSessionPage: React.FC = () => {
   const { sessionId = "" } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
 
-  // Fetch data
+  // Hooks now return standardized types
   const {
     data: session,
     isLoading: sessionLoading,
     error: sessionError,
-  } = useSession(sessionId);
-  const { data: ideas, isLoading: ideasLoading } = useSessionIdeas(sessionId);
-  const { data: categories, isLoading: categoriesLoading } =
-    useCategories(sessionId); // Assuming hook can take sessionId
+  } = useGetSession(sessionId);
+  const { data: ideas = [], isLoading: ideasLoading } =
+    useGetSessionIdeas(sessionId);
+  const { data: categories = [], isLoading: categoriesLoading } =
+    useGetCategories();
 
   // Mutations
   const createIdeaMutation = useCreateIdea();
-  // Need to pass ID dynamically to update/delete mutations, often done via wrapper fn
   const updateIdeaMutation = useUpdateIdea();
   const deleteIdeaMutation = useDeleteIdea();
   const createCategoryMutation = useCreateCategory();
   const updateCategoryMutation = useUpdateCategory();
   const deleteCategoryMutation = useDeleteCategory();
 
-  // Local state
-  const [ideaFormData, setIdeaFormData] = useState<IdeaFormData>({
+  // Local state for forms - use Partial<Create...>
+  const [ideaFormData, setIdeaFormData] = useState<Partial<CreateIdeaData>>({
     content: "",
     categoryId: undefined,
   });
-  const [categoryFormData, setCategoryFormData] = useState<CategoryFormData>({
-    name: "",
-    color: "blue",
-  });
+  const [categoryFormData, setCategoryFormData] = useState<
+    Partial<CreateCategoryData>
+  >({ name: "", color: "blue" });
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [editingCategoryId, setEditingCategoryId] = useState<string | null>(
     null
   );
   const [editingIdeaId, setEditingIdeaId] = useState<string | null>(null);
-  const [editingIdeaData, setEditingIdeaData] = useState<IdeaFormData>({
-    content: "",
-    categoryId: undefined,
-  });
+  // Use Partial<Update...> for edit state
+  const [editingIdeaData, setEditingIdeaData] = useState<
+    Partial<UpdateIdeaData>
+  >({ content: "", categoryId: undefined, position: undefined });
   const [showIdeaModal, setShowIdeaModal] = useState(false);
 
-  // Filter categories (assuming categories might contain others if not filtered by hook)
-  const sessionCategories =
-    categories?.filter((category) => category.sessionId === sessionId) || [];
+  // Filter categories using standardized Category type with sessionId
+  const sessionCategories: Category[] =
+    categories?.filter(
+      (category: Category) => category.sessionId === sessionId
+    ) || [];
+
+  // --- DndKit Sensors ---
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   // Loading state
   if (sessionLoading || ideasLoading || categoriesLoading) {
@@ -177,16 +304,19 @@ const EnhancedSessionPage: React.FC = () => {
 
   const handleCreateIdeaSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!ideaFormData.content.trim()) return;
+    if (!ideaFormData.content?.trim()) return;
     try {
-      const position = getDefaultPosition(ideas?.length || 0);
-      await createIdeaMutation.mutateAsync({
+      const position = getDefaultPosition(ideas.length, ideas);
+      // CreateIdeaData requires createdBy, ensure all required fields are present
+      const ideaPayload: CreateIdeaData = {
         content: ideaFormData.content,
         sessionId,
         categoryId: ideaFormData.categoryId,
-        position: position, // Pass Position object if API expects it
-      });
-      setIdeaFormData({ content: "", categoryId: undefined });
+        position: position,
+        createdBy: "00000000-0000-0000-0000-000000000000", // Placeholder
+      };
+      await createIdeaMutation.mutateAsync(ideaPayload);
+      setIdeaFormData({ content: "", categoryId: undefined }); // Reset form
     } catch (error) {
       console.error("Failed to create idea:", error);
     }
@@ -194,23 +324,28 @@ const EnhancedSessionPage: React.FC = () => {
 
   const handleCategoryFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!categoryFormData.name.trim()) return;
+    if (!categoryFormData.name?.trim() || !categoryFormData.color) return;
     try {
-      const mutationData = {
-        id: editingCategoryId, // Will be null for creation
-        name: categoryFormData.name,
-        color: categoryFormData.color,
-        sessionId: sessionId, // Needed for creation/update validation
-      };
       if (editingCategoryId) {
+        // UpdateCategoryData has optional fields
+        const updatePayload: UpdateCategoryData = {
+          name: categoryFormData.name,
+          color: categoryFormData.color,
+        };
         await updateCategoryMutation.mutateAsync({
           id: editingCategoryId,
-          data: mutationData,
+          data: updatePayload,
         });
       } else {
-        await createCategoryMutation.mutateAsync(mutationData);
+        // CreateCategoryData requires name, color, sessionId
+        const createPayload: CreateCategoryData = {
+          name: categoryFormData.name,
+          color: categoryFormData.color,
+          sessionId: sessionId,
+        };
+        await createCategoryMutation.mutateAsync(createPayload);
       }
-      setCategoryFormData({ name: "", color: "blue" });
+      setCategoryFormData({ name: "", color: "blue" }); // Reset form
       setShowCategoryModal(false);
       setEditingCategoryId(null);
     } catch (error) {
@@ -218,6 +353,7 @@ const EnhancedSessionPage: React.FC = () => {
     }
   };
 
+  // Category type from categoryApi.ts has color
   const handleEditCategoryClick = (category: Category) => {
     setEditingCategoryId(category.id);
     setCategoryFormData({ name: category.name, color: category.color });
@@ -235,19 +371,30 @@ const EnhancedSessionPage: React.FC = () => {
     }
   };
 
+  // Idea type from ideaApi.ts has categoryId
   const handleEditIdeaClick = (idea: Idea) => {
     setEditingIdeaId(idea.id);
-    setEditingIdeaData({ content: idea.content, categoryId: idea.categoryId });
+    setEditingIdeaData({
+      content: idea.content,
+      categoryId: idea.categoryId,
+      position: idea.position, // Load position into edit form
+    });
     setShowIdeaModal(true);
   };
 
   const handleUpdateIdeaSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingIdeaId || !editingIdeaData.content.trim()) return;
+    if (!editingIdeaId || !editingIdeaData.content?.trim()) return;
     try {
+      // Ensure position is included in the update payload
+      const updatePayload: UpdateIdeaData = {
+        content: editingIdeaData.content,
+        categoryId: editingIdeaData.categoryId,
+        position: editingIdeaData.position, // Send updated position
+      };
       await updateIdeaMutation.mutateAsync({
         id: editingIdeaId,
-        data: editingIdeaData,
+        data: updatePayload,
       });
       setShowIdeaModal(false);
       setEditingIdeaId(null);
@@ -264,6 +411,53 @@ const EnhancedSessionPage: React.FC = () => {
       } catch (error) {
         console.error("Failed to delete idea:", error);
       }
+    }
+  };
+
+  // --- Drag and Drop Handler ---
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const activeIdea = ideas.find((idea) => idea.id === active.id);
+      const overIdea = ideas.find((idea) => idea.id === over.id); // The idea being dropped onto
+
+      if (!activeIdea || !over) return; // Should not happen if IDs are correct
+
+      // Calculate new position based on drag event delta
+      // Note: event.delta gives the pixel difference moved
+      // We need to update the idea's absolute position property
+      const newPosition: Position = {
+        x: (activeIdea.position?.x || 0) + event.delta.x,
+        y: (activeIdea.position?.y || 0) + event.delta.y,
+      };
+
+      // Basic validation: ensure position is not negative
+      newPosition.x = Math.max(0, newPosition.x);
+      newPosition.y = Math.max(0, newPosition.y);
+
+      // Call mutation to update the position in the backend
+      updateIdeaMutation.mutate(
+        {
+          id: active.id as string,
+          data: { position: newPosition }, // Only update position
+        },
+        {
+          onError: (error) => {
+            console.error("Failed to update idea position:", error);
+            // Optional: Revert optimistic update if implemented
+          },
+          // Note: onSuccess invalidation is handled by the hook itself
+        }
+      );
+
+      // Optimistic UI update (or rely on query invalidation)
+      // For simplicity, we rely on the hook's onSuccess invalidation for now.
+      // If optimistic updates are needed later:
+      // const oldIndex = ideas.findIndex(idea => idea.id === active.id);
+      // const newIndex = ideas.findIndex(idea => idea.id === over.id);
+      // const movedIdeas = arrayMove(ideas, oldIndex, newIndex);
+      // queryClient.setQueryData(IDEA_KEYS.bySession(sessionId), movedIdeas); // Example
     }
   };
 
@@ -292,20 +486,26 @@ const EnhancedSessionPage: React.FC = () => {
         </Button>
       </div>
 
-      {/* Session header - Use DaisyUI Card */}
+      {/* Session header - Use standardized Session type */}
       <div className="card bg-base-100 shadow-xl">
         <div className="card-body">
           <div className="flex flex-wrap justify-between items-center gap-2 mb-2">
-            <h1 className="card-title text-3xl">{session.title}</h1>
-            <div className="badge badge-lg {session.isPublic ? 'badge-success' : 'badge-neutral'}">
-              {session.isPublic ? "Public" : "Private"}
-            </div>
+            {/* Access session.title and session.isPublic */}
+            <h1 className="card-title text-3xl">{session?.title}</h1>
+            {session && (
+              <div
+                className={`badge badge-lg ${session.isPublic ? "badge-success" : "badge-neutral"}`}
+              >
+                {session.isPublic ? "Public" : "Private"}
+              </div>
+            )}
           </div>
-          {session.description && (
+          {session?.description && (
             <p className="text-base-content/80 mb-4">{session.description}</p>
           )}
           <div className="text-sm text-base-content/70">
-            Created on {new Date(session.createdAt).toLocaleDateString()}
+            Created on{" "}
+            {session ? new Date(session.createdAt).toLocaleDateString() : "..."}
           </div>
         </div>
       </div>
@@ -327,7 +527,7 @@ const EnhancedSessionPage: React.FC = () => {
                   rows={3}
                   className="textarea textarea-bordered"
                   placeholder="Write your idea here..."
-                  value={ideaFormData.content}
+                  value={ideaFormData.content || ""}
                   onChange={(e) =>
                     setIdeaFormData({
                       ...ideaFormData,
@@ -366,7 +566,8 @@ const EnhancedSessionPage: React.FC = () => {
                   variant="primary"
                   isLoading={createIdeaMutation.isPending}
                   disabled={
-                    createIdeaMutation.isPending || !ideaFormData.content.trim()
+                    createIdeaMutation.isPending ||
+                    !ideaFormData.content?.trim()
                   }
                 >
                   Add Idea
@@ -394,46 +595,35 @@ const EnhancedSessionPage: React.FC = () => {
                 </Button>
               </div>
 
-              {/* Categories list */}
+              {/* Categories list - Use standardized Category type */}
               <div className="space-y-2 mt-4">
                 {sessionCategories.length === 0 ? (
                   <p className="text-base-content/70 text-sm italic">
                     No categories yet.
                   </p>
                 ) : (
-                  sessionCategories.map((category) => (
-                    <div
-                      key={category.id}
-                      className={`flex items-center justify-between p-2 rounded-md border border-base-300`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={`w-3 h-3 rounded-full bg-${COLOR_MAP[category.color] || "neutral"}`}
-                        ></div>{" "}
-                        {/* Use mapped color */}
-                        <span className="text-sm font-medium">
-                          {category.name}
-                        </span>
+                  sessionCategories.map(
+                    (
+                      category: Category // Explicit type
+                    ) => (
+                      <div
+                        key={category.id}
+                        className={`flex items-center justify-between p-2 rounded-md border border-base-300`}
+                      >
+                        <div className="flex items-center gap-2">
+                          {/* Access category.color */}
+                          <div
+                            className={`w-3 h-3 rounded-full bg-${COLOR_MAP[category.color] || "neutral"}-500`}
+                          ></div>{" "}
+                          {/* Added -500 for actual color */}
+                          <span className="text-sm font-medium">
+                            {category.name}
+                          </span>
+                        </div>
+                        {/* ... (Edit/Delete buttons) ... */}
                       </div>
-                      <div className="flex space-x-1">
-                        <Button
-                          size="xs"
-                          ghost
-                          onClick={() => handleEditCategoryClick(category)}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          size="xs"
-                          ghost
-                          className="text-error"
-                          onClick={() => handleDeleteCategoryClick(category.id)}
-                        >
-                          Delete
-                        </Button>
-                      </div>
-                    </div>
-                  ))
+                    )
+                  )
                 )}
               </div>
             </div>
@@ -445,85 +635,46 @@ const EnhancedSessionPage: React.FC = () => {
           <div className="card-body">
             <h2 className="card-title">Ideas ({ideas?.length || 0})</h2>
 
-            {/* Ideas list */}
+            {/* Ideas list - Wrapped with DndContext */}
             {!ideas || ideas.length === 0 ? (
               <p className="text-base-content/70 italic">
                 No ideas yet. Add your first idea using the form.
               </p>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                {ideas.map((idea: Idea) => {
-                  // Type hint
-                  const category = sessionCategories.find(
-                    (c) => c.id === idea.categoryId
-                  );
-                  const categoryColorClass = category
-                    ? `bg-${COLOR_MAP[category.color] || "neutral"}`
-                    : "bg-base-200";
-                  const categoryBorderClass = category
-                    ? `border-${COLOR_MAP[category.color] || "neutral"}`
-                    : "border-base-300";
-                  const categoryTextColorClass = category
-                    ? `text-${COLOR_MAP[category.color] || "neutral"}-content`
-                    : "text-base-content";
-
-                  return (
-                    // Use card for each idea
-                    <div
-                      key={idea.id}
-                      className={`card ${categoryColorClass} bg-opacity-10 border ${categoryBorderClass} shadow-sm`}
-                    >
-                      <div className="card-body p-4">
-                        {category && (
-                          <div
-                            className={`badge badge-sm badge-${COLOR_MAP[category.color] || "neutral"} mb-2`}
-                          >
-                            {category.name}
-                          </div>
-                        )}
-                        <p className="mb-3 text-base-content whitespace-pre-wrap">
-                          {idea.content}
-                        </p>
-                        <div className="card-actions justify-between items-center text-sm text-base-content/70">
-                          <span>
-                            Added{" "}
-                            {new Date(idea.createdAt).toLocaleDateString()}
-                          </span>
-                          <div className="flex space-x-1">
-                            <Button
-                              size="xs"
-                              ghost
-                              onClick={() => handleEditIdeaClick(idea)}
-                            >
-                              Edit
-                            </Button>
-                            <Button
-                              size="xs"
-                              ghost
-                              className="text-error"
-                              onClick={() => handleDeleteIdeaClick(idea.id)}
-                            >
-                              Delete
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={ideas.map((idea) => idea.id)}
+                  strategy={rectSortingStrategy}
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 relative">
+                    {ideas.map((idea) => (
+                      <SortableIdea
+                        key={idea.id}
+                        idea={idea}
+                        sessionCategories={sessionCategories}
+                        onEdit={handleEditIdeaClick}
+                        onDelete={handleDeleteIdeaClick}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
             )}
           </div>
         </div>
       </div>
 
-      {/* Modals */}
-      {/* Category Form Modal */}
+      {/* Modals - Use standardized types */}
       <Modal
         isOpen={showCategoryModal}
         onClose={() => setShowCategoryModal(false)}
         title={editingCategoryId ? "Edit Category" : "Create Category"}
       >
+        {/* Use categoryFormData.name, categoryFormData.color */}
         <form onSubmit={handleCategoryFormSubmit} className="space-y-4">
           <div className="form-control">
             <label htmlFor="categoryName" className="label">
@@ -534,7 +685,7 @@ const EnhancedSessionPage: React.FC = () => {
               id="categoryName"
               className="input input-bordered"
               placeholder="Category name"
-              value={categoryFormData.name}
+              value={categoryFormData.name || ""} // Handle potential undefined
               onChange={(e) =>
                 setCategoryFormData({
                   ...categoryFormData,
@@ -548,7 +699,6 @@ const EnhancedSessionPage: React.FC = () => {
             <label className="label">
               <span className="label-text">Color</span>
             </label>
-            {/* Use radio buttons for color selection */}
             <div className="flex flex-wrap gap-2">
               {COLORS.map((color) => (
                 <label key={color.value} className="label cursor-pointer gap-2">
@@ -590,7 +740,7 @@ const EnhancedSessionPage: React.FC = () => {
               disabled={
                 createCategoryMutation.isPending ||
                 updateCategoryMutation.isPending ||
-                !categoryFormData.name.trim()
+                !categoryFormData.name?.trim()
               }
             >
               {editingCategoryId ? "Update" : "Create"}
@@ -599,12 +749,12 @@ const EnhancedSessionPage: React.FC = () => {
         </form>
       </Modal>
 
-      {/* Edit Idea Modal */}
       <Modal
         isOpen={showIdeaModal}
         onClose={() => setShowIdeaModal(false)}
         title="Edit Idea"
       >
+        {/* Use editingIdeaData.content, editingIdeaData.categoryId */}
         <form onSubmit={handleUpdateIdeaSubmit} className="space-y-4">
           <div className="form-control">
             <label htmlFor="editContent" className="label">
@@ -614,7 +764,7 @@ const EnhancedSessionPage: React.FC = () => {
               id="editContent"
               className="textarea textarea-bordered"
               rows={4}
-              value={editingIdeaData.content}
+              value={editingIdeaData.content || ""} // Handle potential undefined
               onChange={(e) =>
                 setEditingIdeaData({
                   ...editingIdeaData,
@@ -624,6 +774,7 @@ const EnhancedSessionPage: React.FC = () => {
               required
             />
           </div>
+          {/* Re-enable category selection */}
           <div className="form-control">
             <label htmlFor="editCategoryId" className="label">
               <span className="label-text">Category</span>
@@ -647,6 +798,18 @@ const EnhancedSessionPage: React.FC = () => {
               ))}
             </select>
           </div>
+          {/* Optional: Display/Edit Position */}
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">Position (Readonly)</span>
+            </label>
+            <input
+              type="text"
+              className="input input-bordered input-sm"
+              readOnly
+              value={`X: ${editingIdeaData.position?.x ?? "N/A"}, Y: ${editingIdeaData.position?.y ?? "N/A"}`}
+            />
+          </div>
           <div className="modal-action">
             <Button
               type="button"
@@ -660,7 +823,7 @@ const EnhancedSessionPage: React.FC = () => {
               variant="primary"
               isLoading={updateIdeaMutation.isPending}
               disabled={
-                updateIdeaMutation.isPending || !editingIdeaData.content.trim()
+                updateIdeaMutation.isPending || !editingIdeaData.content?.trim()
               }
             >
               Save Changes

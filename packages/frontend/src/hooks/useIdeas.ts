@@ -1,6 +1,41 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ideaApi, CreateIdeaData, UpdateIdeaData, Idea } from "../api";
+import { apiConfig, ApiResponse } from "../api/config";
 import { SESSION_KEYS } from "./useSessions";
+import { Category } from "../api/categoryApi";
+
+// Moved types from ideaApi.ts
+export interface Position {
+  x: number;
+  y: number;
+}
+
+export interface Idea {
+  id: string;
+  content: string;
+  sessionId: string;
+  categoryId?: string;
+  createdBy: string;
+  position: Position;
+  upvotes: number;
+  category?: Category;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateIdeaData {
+  content: string;
+  sessionId: string;
+  categoryId?: string;
+  createdBy: string;
+  position?: Position;
+}
+
+export interface UpdateIdeaData {
+  content?: string;
+  categoryId?: string | null;
+  position?: Position;
+}
+// End of moved types
 
 // Query keys
 export const IDEA_KEYS = {
@@ -23,7 +58,7 @@ export function useIdeas() {
   return useQuery({
     queryKey: IDEA_KEYS.lists(),
     queryFn: async () => {
-      const response = await ideaApi.getIdeas();
+      const response = await apiConfig.get<Idea[]>("/ideas");
       if (!response.success) {
         throw new Error(response.error || "Failed to fetch ideas");
       }
@@ -39,13 +74,13 @@ export function useIdea(id: string) {
   return useQuery({
     queryKey: IDEA_KEYS.detail(id),
     queryFn: async () => {
-      const response = await ideaApi.getIdea(id);
+      const response = await apiConfig.get<Idea>(`/ideas/${id}`);
       if (!response.success) {
         throw new Error(response.error || "Failed to fetch idea");
       }
       return response.data as Idea;
     },
-    enabled: !!id, // Only run query if ID is provided
+    enabled: !!id,
   });
 }
 
@@ -56,13 +91,15 @@ export function useSessionIdeas(sessionId: string) {
   return useQuery({
     queryKey: IDEA_KEYS.bySession(sessionId),
     queryFn: async () => {
-      const response = await ideaApi.getIdeasBySession(sessionId);
+      const response = await apiConfig.get<Idea[]>(
+        `/ideas/session/${sessionId}`
+      );
       if (!response.success) {
         throw new Error(response.error || "Failed to fetch session ideas");
       }
       return response.data as Idea[];
     },
-    enabled: !!sessionId, // Only run query if session ID is provided
+    enabled: !!sessionId,
   });
 }
 
@@ -73,13 +110,15 @@ export function useCategoryIdeas(categoryId: string) {
   return useQuery({
     queryKey: IDEA_KEYS.byCategory(categoryId),
     queryFn: async () => {
-      const response = await ideaApi.getIdeasByCategory(categoryId);
+      const response = await apiConfig.get<Idea[]>(
+        `/ideas/category/${categoryId}`
+      );
       if (!response.success) {
         throw new Error(response.error || "Failed to fetch category ideas");
       }
       return response.data as Idea[];
     },
-    enabled: !!categoryId, // Only run query if category ID is provided
+    enabled: !!categoryId,
   });
 }
 
@@ -91,29 +130,25 @@ export function useCreateIdea() {
 
   return useMutation({
     mutationFn: async (data: CreateIdeaData) => {
-      const response = await ideaApi.createIdea(data);
+      const response = await apiConfig.post<Idea>("/ideas", data);
       if (!response.success) {
         throw new Error(response.error || "Failed to create idea");
       }
       return response.data as Idea;
     },
     onSuccess: (newIdea) => {
-      // Invalidate ideas list query to refetch
       queryClient.invalidateQueries({ queryKey: IDEA_KEYS.lists() });
 
-      // Invalidate session ideas
       if (newIdea.sessionId) {
         queryClient.invalidateQueries({
           queryKey: IDEA_KEYS.bySession(newIdea.sessionId),
         });
 
-        // Also invalidate the session detail to reflect idea count changes
         queryClient.invalidateQueries({
           queryKey: SESSION_KEYS.detail(newIdea.sessionId),
         });
       }
 
-      // If idea has a category, invalidate category ideas
       if (newIdea.categoryId) {
         queryClient.invalidateQueries({
           queryKey: IDEA_KEYS.byCategory(newIdea.categoryId),
@@ -131,27 +166,23 @@ export function useUpdateIdea(id: string) {
 
   return useMutation({
     mutationFn: async (data: UpdateIdeaData) => {
-      const response = await ideaApi.updateIdea(id, data);
+      const response = await apiConfig.put<Idea>(`/ideas/${id}`, data);
       if (!response.success) {
         throw new Error(response.error || "Failed to update idea");
       }
       return response.data as Idea;
     },
     onSuccess: (updatedIdea) => {
-      // Update the idea in the cache
       queryClient.setQueryData(IDEA_KEYS.detail(id), updatedIdea);
 
-      // Invalidate all idea lists
       queryClient.invalidateQueries({ queryKey: IDEA_KEYS.lists() });
 
-      // Invalidate session ideas
       if (updatedIdea.sessionId) {
         queryClient.invalidateQueries({
           queryKey: IDEA_KEYS.bySession(updatedIdea.sessionId),
         });
       }
 
-      // If idea has a category, invalidate category ideas
       if (updatedIdea.categoryId) {
         queryClient.invalidateQueries({
           queryKey: IDEA_KEYS.byCategory(updatedIdea.categoryId),
@@ -169,16 +200,22 @@ export function useDeleteIdea() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      // Get the idea first to know its session and category for cache invalidation
-      const ideaResponse = await ideaApi.getIdea(id);
-      const idea = ideaResponse.data as Idea;
+      const ideaResponse = await apiConfig.get<Idea>(`/ideas/${id}`);
+      const idea = ideaResponse.data;
 
-      const response = await ideaApi.deleteIdea(id);
+      if (!ideaResponse.success || !idea) {
+        console.warn(
+          `Failed to fetch idea ${id} before deleting, cache invalidation for session/category might be incomplete.`
+        );
+      }
+
+      const response = await apiConfig.delete<{ success: boolean }>(
+        `/ideas/${id}`
+      );
       if (!response.success) {
         throw new Error(response.error || "Failed to delete idea");
       }
 
-      // Return id, sessionId, and categoryId for cache invalidation
       return {
         id,
         sessionId: idea?.sessionId,
@@ -186,25 +223,20 @@ export function useDeleteIdea() {
       };
     },
     onSuccess: ({ id, sessionId, categoryId }) => {
-      // Remove the idea from the cache
       queryClient.removeQueries({ queryKey: IDEA_KEYS.detail(id) });
 
-      // Invalidate idea lists
       queryClient.invalidateQueries({ queryKey: IDEA_KEYS.lists() });
 
-      // Invalidate session ideas
       if (sessionId) {
         queryClient.invalidateQueries({
           queryKey: IDEA_KEYS.bySession(sessionId),
         });
 
-        // Also invalidate the session detail to reflect idea count changes
         queryClient.invalidateQueries({
           queryKey: SESSION_KEYS.detail(sessionId),
         });
       }
 
-      // If idea had a category, invalidate category ideas
       if (categoryId) {
         queryClient.invalidateQueries({
           queryKey: IDEA_KEYS.byCategory(categoryId),

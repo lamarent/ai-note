@@ -16,6 +16,6 @@ auto run commands
 monorepo
 minimal, small wins, keep simple, runable, workable first
 always maintain development tracking: context, memory, plan, adr, knowledge, etc.
-summary, what next steps, update context doc after each task done
+summary, what next steps, remember always update context after each task done
 read or search library doc before use
 use search or read tree file (should update) from doc instead of list items to reduce tool call

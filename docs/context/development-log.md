@@ -2,6 +2,74 @@
 
 This file tracks the development activities of the AI Brainstorm app in reverse chronological order (newest entries at the top).
 
+## 2024-10-11: DaisyUI Refactoring
+
+- **Refactored frontend components to use DaisyUI:**
+  - Removed custom Tailwind CSS styles from common components (`Button`, `Card`, `Modal`, `Input`), layout components (`Header`, `Footer`, `Layout`), idea components (`AddIdeaForm`, `IdeaCard`, `IdeaForm`, `IdeasList`), and session components (`SessionDetail`, `SessionsList`, `EnhancedSessionPage`).
+  - Replaced custom styles with DaisyUI component classes (`btn`, `card`, `modal`, `navbar`, `footer`, `alert`, `loading`, `badge`, `form-control`, `input`, `textarea`, `select`, `join`, etc.) and semantic theme colors (`primary`, `secondary`, `accent`, `neutral`, `base-100/200/300`, `info`, `success`, `warning`, `error`).
+  - Ensured components utilize `base-*` colors for backgrounds and content to support light/dark themes automatically.
+  - Updated `EnhancedSessionPage` extensively, moving inline forms to modals and using DaisyUI structure throughout.
+- **Error Resolution:**
+  - Fixed numerous type errors arising from inconsistent type definitions (`Session`, `Idea`, `Category`) across different API/type files by standardizing usage within components (though underlying type inconsistencies in hooks/API might remain).
+  - Corrected hook import paths and usage based on definitions (`useGetSession`, `useGetSessionIdeas`, etc.).
+  - Resolved issues with mutation payloads to match expected types.
+- **Next Steps:**
+  - Thoroughly test the UI in both light and dark modes.
+  - Address the underlying type inconsistencies between `api/types.ts` and `api/*Api.ts` definitions and update hooks accordingly for better type safety.
+  - Implement core features like drag-and-drop for ideas or category filtering/assignment.
+
+## 2024-10-10: Frontend Architecture Refactoring
+
+- **Implemented comprehensive frontend refactoring:**
+  - Established a modern, modular directory structure following React best practices
+  - Created reusable UI components with proper TypeScript typing
+  - Implemented clean separation between UI, data fetching, and business logic
+  - Standardized API integration with React Query and custom hooks
+  - Improved error handling and state management patterns
+- **Key components created:**
+  - Common UI components (Button, Card, Modal, Input)
+  - Layout components (Header, Footer, Layout)
+  - Standardized page structure with consistent patterns
+- **API and data handling improvements:**
+  - Moved API calls to dedicated service modules
+  - Implemented comprehensive React Query hooks
+  - Added proper error handling and loading states
+  - Typed API responses and requests
+- **Technical details:**
+  - Used React Router v7 for routing with object-based route configuration
+  - Implemented Zustand for lightweight state management
+  - Enhanced TypeScript usage with proper interface definitions
+  - Improved component organization with feature-based folders
+- **Next steps:**
+  - Complete migration of existing components to the new structure
+  - Implement authentication integration
+  - Add comprehensive unit and integration tests
+  - Create detailed component documentation
+
+## 2024-10-11: Ideas Management Feature Implementation
+
+- **Implemented core ideas management functionality:**
+  - Created API services and React Query hooks for ideas CRUD operations
+  - Developed reusable IdeaCard and IdeaForm components
+  - Integrated ideas list display in session detail page
+  - Added modals for creating, editing, and deleting ideas
+- **Key features added:**
+  - Session detail page with ideas list
+  - Create new ideas with content and optional categorization
+  - Edit existing ideas
+  - Delete ideas with confirmation dialog
+  - Loading and error states for all operations
+- **Technical improvements:**
+  - Implemented proper TypeScript interfaces for ideas data
+  - Created service layer for API communication
+  - Established consistent React Query patterns for data fetching and mutations
+  - Fixed linting issues for better code quality
+- **Next steps:**
+  - Implement categories management
+  - Add drag-and-drop UI for idea positioning
+  - Implement visual workspace for ideas
+  - Add authentication and proper authorization checks
+
 ## 2024-04-17: Frontend Integration with Database
 
 - **Implemented frontend integration with the database:**
@@ -224,54 +292,42 @@ The API now follows a clean layered architecture:
 3. **API Documentation** - Create OpenAPI documentation
 4. **Frontend Integration** - Connect frontend components to new API endpoints
 
-## 2024-10-10: Frontend Architecture Refactoring
+## 2024-10-11: Hooks and Component Refactoring (Continued)
 
-- **Implemented comprehensive frontend refactoring:**
-  - Established a modern, modular directory structure following React best practices
-  - Created reusable UI components with proper TypeScript typing
-  - Implemented clean separation between UI, data fetching, and business logic
-  - Standardized API integration with React Query and custom hooks
-  - Improved error handling and state management patterns
-- **Key components created:**
-  - Common UI components (Button, Card, Modal, Input)
-  - Layout components (Header, Footer, Layout)
-  - Standardized page structure with consistent patterns
-- **API and data handling improvements:**
-  - Moved API calls to dedicated service modules
-  - Implemented comprehensive React Query hooks
-  - Added proper error handling and loading states
-  - Typed API responses and requests
-- **Technical details:**
-  - Used React Router v7 for routing with object-based route configuration
-  - Implemented Zustand for lightweight state management
-  - Enhanced TypeScript usage with proper interface definitions
-  - Improved component organization with feature-based folders
-- **Next steps:**
-  - Complete migration of existing components to the new structure
-  - Implement authentication integration
-  - Add comprehensive unit and integration tests
-  - Create detailed component documentation
+- **Refactored Core Data Hooks:**
+  - Standardized `useSessions.ts`, `useIdeas.ts`, and `useCategories.ts`.
+  - Imported specific types (`Session`, `Idea`, `Category`, `Create*Data`, `Update*Data`) directly from their respective `api/*Api.ts` files.
+  - Replaced raw `fetch` calls with methods from the corresponding API service modules (`sessionApi`, `ideaApi`, `categoryApi`).
+  - Ensured proper error handling (throwing `Error` on failed API responses).
+  - Implemented robust query key structures (`SESSION_KEYS`, `IDEA_KEYS`, `CATEGORY_KEYS`) for granular cache management.
+  - Added appropriate cache invalidation logic (`queryClient.invalidateQueries`, `queryClient.setQueryData`, `queryClient.removeQueries`) in mutation `onSuccess` handlers to keep UI consistent, including invalidating related queries (e.g., invalidating idea lists when a category is deleted/updated).
+- **Updated `EnhancedSessionPage.tsx`:**
+  - Adjusted component to consume the refactored hooks and their standardized return types.
+  - Imported types directly from `api/*Api.ts` files.
+  - Corrected property access (e.g., `session.title`, `idea.categoryId`, `category.color`, `category.sessionId`) in JSX and event handlers.
+  - Updated form state management (`useState`) to use `Partial<Create*Data>` and `Partial<Update*Data>` types.
+  - Ensured data payloads passed to mutation hooks match the required `Create*Data` and `Update*Data` types.
+  - Re-enabled category filtering based on `category.sessionId` and category display/selection features.
+- **Redundancy Note:** The file `packages/frontend/src/api/types.ts` likely contains outdated or less specific types and may be redundant now that hooks/components use types directly from `api/*Api.ts`. Consider removing or refactoring this file.
+- **Next Steps:**
+  - Implement core features, starting with drag-and-drop for ideas.
+  - Run linters (`pnpm -r lint`) to catch any remaining issues.
+  - Address the potential redundancy of `api/types.ts`.
 
-## 2024-10-11: Ideas Management Feature Implementation
+## 2024-10-12: UI & API Refactoring
 
-- **Implemented core ideas management functionality:**
-  - Created API services and React Query hooks for ideas CRUD operations
-  - Developed reusable IdeaCard and IdeaForm components
-  - Integrated ideas list display in session detail page
-  - Added modals for creating, editing, and deleting ideas
-- **Key features added:**
-  - Session detail page with ideas list
-  - Create new ideas with content and optional categorization
-  - Edit existing ideas
-  - Delete ideas with confirmation dialog
-  - Loading and error states for all operations
-- **Technical improvements:**
-  - Implemented proper TypeScript interfaces for ideas data
-  - Created service layer for API communication
-  - Established consistent React Query patterns for data fetching and mutations
-  - Fixed linting issues for better code quality
-- **Next steps:**
-  - Implement categories management
-  - Add drag-and-drop UI for idea positioning
-  - Implement visual workspace for ideas
-  - Add authentication and proper authorization checks
+- **Removed Chakra UI and dependencies:**
+  - Uninstalled `@chakra-ui/react`, `@emotion/react`, `@emotion/styled`, and `framer-motion`.
+  - Deleted the `ChakraProvider` wrapper in `main.tsx` and removed all Chakra imports in components.
+- **Integrated Tailwind CSS with DaisyUI:**
+  - Enabled DaisyUI plugin via `index.css` configuration.
+  - Created `Sidebar` and `Layout` components using Tailwind CSS and DaisyUI utility classes.
+  - Wrapped application routes in `<Layout>` within `App.tsx` to include the new sidebar.
+- **Consolidated API Hooks to `apiConfig`:**
+  - Deleted redundant API modules (`userApi.ts`, `sessionApi.ts`, `categoryApi.ts`, `ideaApi.ts`).
+  - Refactored `useUsers`, `useSessions`, `useCategories`, and `useIdeas` to import `apiConfig` directly.
+  - Moved relevant type definitions into their respective hook files.
+- **Verification & Next Steps:**
+  - Run `pnpm -r lint` to catch any issues.
+  - Test UI layout, responsiveness, and DaisyUI theming across pages.
+  - Remove `packages/frontend/src/api/types.ts` if it's still present and redundant.

@@ -11,7 +11,7 @@ const Header: React.FC<HeaderProps> = ({
   showNavigation = true,
 }) => {
   return (
-    <div className="navbar bg-primary text-primary-content shadow-md">
+    <div className="navbar bg-base-100 shadow-md">
       <div className="flex-1">
         <Link to="/" className="btn btn-ghost text-xl">
           {title}

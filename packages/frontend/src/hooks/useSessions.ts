@@ -1,10 +1,37 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  sessionApi,
-  CreateSessionData,
-  UpdateSessionData,
-  Session,
-} from "../api";
+import { apiConfig, ApiResponse } from "../api/config";
+import { User } from "./useUsers";
+import { Category } from "./useCategories";
+import { Idea } from "./useIdeas";
+
+export interface Session {
+  id: string;
+  title: string;
+  description?: string;
+  ownerId: string;
+  isPublic: boolean;
+  owner?: User;
+  collaborators?: User[];
+  categories?: Category[];
+  ideas?: Idea[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateSessionData {
+  title: string;
+  description?: string;
+  ownerId: string;
+  collaborators?: string[];
+  isPublic?: boolean;
+}
+
+export interface UpdateSessionData {
+  title?: string;
+  description?: string;
+  collaborators?: string[];
+  isPublic?: boolean;
+}
 
 // Query keys
 export const SESSION_KEYS = {
@@ -24,7 +51,7 @@ export function useSessions() {
   return useQuery({
     queryKey: SESSION_KEYS.lists(),
     queryFn: async () => {
-      const response = await sessionApi.getSessions();
+      const response = await apiConfig.get<Session[]>("/sessions");
       if (!response.success) {
         throw new Error(response.error || "Failed to fetch sessions");
       }
@@ -40,7 +67,7 @@ export function useSession(id: string) {
   return useQuery({
     queryKey: SESSION_KEYS.detail(id),
     queryFn: async () => {
-      const response = await sessionApi.getSession(id);
+      const response = await apiConfig.get<Session>(`/sessions/${id}`);
       if (!response.success) {
         throw new Error(response.error || "Failed to fetch session");
       }
@@ -57,7 +84,9 @@ export function useSessionsByOwner(ownerId: string) {
   return useQuery({
     queryKey: SESSION_KEYS.byOwner(ownerId),
     queryFn: async () => {
-      const response = await sessionApi.getSessionsByOwner(ownerId);
+      const response = await apiConfig.get<Session[]>(
+        `/sessions/user/${ownerId}`
+      );
       if (!response.success) {
         throw new Error(response.error || "Failed to fetch owner sessions");
       }
@@ -75,7 +104,7 @@ export function useCreateSession() {
 
   return useMutation({
     mutationFn: async (data: CreateSessionData) => {
-      const response = await sessionApi.createSession(data);
+      const response = await apiConfig.post<Session>("/sessions", data);
       if (!response.success) {
         throw new Error(response.error || "Failed to create session");
       }
@@ -103,7 +132,7 @@ export function useUpdateSession(id: string) {
 
   return useMutation({
     mutationFn: async (data: UpdateSessionData) => {
-      const response = await sessionApi.updateSession(id, data);
+      const response = await apiConfig.put<Session>(`/sessions/${id}`, data);
       if (!response.success) {
         throw new Error(response.error || "Failed to update session");
       }
@@ -135,10 +164,19 @@ export function useDeleteSession() {
   return useMutation({
     mutationFn: async (id: string) => {
       // Get the session first to know the owner ID for cache invalidation
-      const sessionResponse = await sessionApi.getSession(id);
-      const session = sessionResponse.data as Session;
+      const sessionResponse = await apiConfig.get<Session>(`/sessions/${id}`);
+      const session = sessionResponse.data;
 
-      const response = await sessionApi.deleteSession(id);
+      if (!sessionResponse.success || !session) {
+        console.warn(
+          `Failed to fetch session ${id} before deleting, cache invalidation for owner might be incomplete.`
+        );
+        // Decide if we should throw or continue
+      }
+
+      const response = await apiConfig.delete<{ success: boolean }>(
+        `/sessions/${id}`
+      );
       if (!response.success) {
         throw new Error(response.error || "Failed to delete session");
       }

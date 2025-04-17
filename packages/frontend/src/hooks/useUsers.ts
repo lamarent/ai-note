@@ -1,5 +1,28 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { userApi, CreateUserData, UpdateUserData, User } from "../api";
+import { apiConfig, ApiResponse } from "../api/config";
+
+// Moved types from userApi.ts - IMPORTANT: Export User
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateUserData {
+  name: string;
+  email: string;
+  avatar?: string;
+}
+
+export interface UpdateUserData {
+  name?: string;
+  email?: string;
+  avatar?: string;
+}
+// End of moved types
 
 // Query keys
 export const USER_KEYS = {
@@ -18,7 +41,7 @@ export function useUsers() {
   return useQuery({
     queryKey: USER_KEYS.lists(),
     queryFn: async () => {
-      const response = await userApi.getUsers();
+      const response = await apiConfig.get<User[]>("/users");
       if (!response.success) {
         throw new Error(response.error || "Failed to fetch users");
       }
@@ -34,7 +57,7 @@ export function useUser(id: string) {
   return useQuery({
     queryKey: USER_KEYS.detail(id),
     queryFn: async () => {
-      const response = await userApi.getUser(id);
+      const response = await apiConfig.get<User>(`/users/${id}`);
       if (!response.success) {
         throw new Error(response.error || "Failed to fetch user");
       }
@@ -52,7 +75,7 @@ export function useCreateUser() {
 
   return useMutation({
     mutationFn: async (data: CreateUserData) => {
-      const response = await userApi.createUser(data);
+      const response = await apiConfig.post<User>("/users", data);
       if (!response.success) {
         throw new Error(response.error || "Failed to create user");
       }
@@ -73,7 +96,7 @@ export function useUpdateUser(id: string) {
 
   return useMutation({
     mutationFn: async (data: UpdateUserData) => {
-      const response = await userApi.updateUser(id, data);
+      const response = await apiConfig.put<User>(`/users/${id}`, data);
       if (!response.success) {
         throw new Error(response.error || "Failed to update user");
       }
@@ -96,7 +119,9 @@ export function useDeleteUser() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await userApi.deleteUser(id);
+      const response = await apiConfig.delete<{ success: boolean }>(
+        `/users/${id}`
+      );
       if (!response.success) {
         throw new Error(response.error || "Failed to delete user");
       }
