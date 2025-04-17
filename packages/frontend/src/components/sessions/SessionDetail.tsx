@@ -1,12 +1,13 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
-import IdeasList from "./IdeasList";
+import IdeasList from "../ideas/IdeasList";
 import {
   useGetSession,
   useDeleteSession,
   useUpdateSession,
-} from "../api/hooks";
-import { UpdateSessionData } from "../api/types";
+} from "../../api/hooks";
+import { UpdateSessionData } from "../../api/types";
+import Button from "../common/Button"; // Import refactored Button
 
 export default function SessionDetail() {
   const { id } = useParams<{ id: string }>();
@@ -14,7 +15,25 @@ export default function SessionDetail() {
 
   // Ensure id is defined
   if (!id) {
-    return <div className="p-4">Session ID is missing</div>;
+    // Use alert for error messages
+    return (
+      <div role="alert" className="alert alert-error m-4">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="stroke-current shrink-0 h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <span>Session ID is missing</span>
+      </div>
+    );
   }
 
   // Fetch session data
@@ -33,6 +52,7 @@ export default function SessionDetail() {
 
   // Handle session deletion
   const handleDelete = () => {
+    // Consider using a Modal component here
     if (window.confirm("Are you sure you want to delete this session?")) {
       deleteSessionMutation.mutate(id, {
         onSuccess: () => {
@@ -82,31 +102,74 @@ export default function SessionDetail() {
     });
   };
 
-  if (isLoading) return <div className="p-4">Loading session...</div>;
-
-  if (isError)
+  // Use loading spinner
+  if (isLoading)
     return (
-      <div className="p-4 text-red-500">
-        Error:{" "}
-        {error instanceof Error ? error.message : "Failed to load session"}
+      <div className="flex justify-center items-center p-10">
+        <span className="loading loading-lg loading-spinner text-primary"></span>
       </div>
     );
 
-  if (!session) return <div className="p-4">Session not found</div>;
+  // Use alert for errors
+  if (isError)
+    return (
+      <div role="alert" className="alert alert-error m-4">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="stroke-current shrink-0 h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <span>
+          Error:{" "}
+          {error instanceof Error ? error.message : "Failed to load session"}
+        </span>
+      </div>
+    );
+
+  // Use alert for not found
+  if (!session)
+    return (
+      <div role="alert" className="alert alert-warning m-4">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="stroke-current shrink-0 h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+          />
+        </svg>
+        <span>Session not found</span>
+      </div>
+    );
 
   return (
     <div className="container mx-auto p-4">
       {isEditing ? (
-        // Edit form
+        // Edit form - use DaisyUI form controls and Button
         <form
           onSubmit={handleSubmit}
-          className="mb-6 p-4 border rounded-lg bg-gray-50"
+          // Use card or base styles for form background
+          className="mb-6 p-6 card bg-base-200 shadow-xl"
         >
-          <h2 className="text-xl font-bold mb-4">Edit Session</h2>
+          <h2 className="card-title mb-4">Edit Session</h2>
 
-          <div className="mb-3">
-            <label htmlFor="name" className="block text-sm font-medium mb-1">
-              Name <span className="text-red-500">*</span>
+          <div className="form-control w-full mb-3">
+            <label htmlFor="name" className="label">
+              <span className="label-text">Name</span>
+              <span className="label-text-alt text-error">* Required</span>
             </label>
             <input
               type="text"
@@ -114,76 +177,79 @@ export default function SessionDetail() {
               name="name"
               value={editFormData.name}
               onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-md"
+              className="input input-bordered w-full"
               required
             />
           </div>
 
-          <div className="mb-4">
-            <label
-              htmlFor="description"
-              className="block text-sm font-medium mb-1"
-            >
-              Description
+          <div className="form-control w-full mb-4">
+            <label htmlFor="description" className="label">
+              <span className="label-text">Description</span>
             </label>
             <textarea
               id="description"
               name="description"
               value={editFormData.description || ""}
               onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-md"
+              className="textarea textarea-bordered w-full"
               rows={3}
             />
           </div>
 
-          <div className="flex space-x-2">
-            <button
+          <div className="card-actions justify-end space-x-2">
+            <Button
               type="submit"
-              disabled={updateSessionMutation.isPending}
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-blue-300"
+              variant="primary"
+              isLoading={updateSessionMutation.isPending}
+              disabled={
+                updateSessionMutation.isPending || !editFormData.name.trim()
+              }
             >
-              {updateSessionMutation.isPending ? "Saving..." : "Save"}
-            </button>
-            <button
+              Save
+            </Button>
+            <Button
               type="button"
+              variant="ghost"
               onClick={() => setIsEditing(false)}
-              className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400"
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
       ) : (
-        // Session details
+        // Session details - use DaisyUI buttons and text colors
         <div className="mb-6">
           <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl font-bold">{session.name}</h1>
-            <div>
-              <button
-                onClick={startEditing}
-                className="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 mr-2"
-              >
+            <h1 className="text-2xl font-bold text-base-content">
+              {session.name}
+            </h1>
+            <div className="space-x-2">
+              <Button onClick={startEditing} variant="outline" size="sm">
                 Edit
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={handleDelete}
-                className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+                variant="error"
+                outline // Make delete less prominent
+                size="sm"
+                isLoading={deleteSessionMutation.isPending}
                 disabled={deleteSessionMutation.isPending}
               >
-                {deleteSessionMutation.isPending ? "Deleting..." : "Delete"}
-              </button>
+                Delete
+              </Button>
             </div>
           </div>
 
           {session.description && (
-            <p className="text-gray-700 mb-4">{session.description}</p>
+            <p className="text-base-content/80 mb-4">{session.description}</p> // Slightly muted content
           )}
 
-          <div className="text-sm text-gray-500">
+          {/* Use muted text color for dates */}
+          <div className="text-sm text-base-content/70">
             Created: {new Date(session.createdAt).toLocaleString()}
           </div>
           {session.updatedAt && (
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-base-content/70">
               Last updated: {new Date(session.updatedAt).toLocaleString()}
             </div>
           )}

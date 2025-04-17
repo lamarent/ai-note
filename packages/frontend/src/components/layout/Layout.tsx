@@ -14,10 +14,10 @@ const Layout: React.FC<LayoutProps> = ({
   showFooter = true,
 }) => {
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100">
+    <div className="min-h-screen flex flex-col bg-base-100">
       <Header showNavigation={showNavigation} />
 
-      <main className="flex-grow py-6">{children}</main>
+      <main className="flex-grow container mx-auto px-4 py-6">{children}</main>
 
       {showFooter && <Footer />}
     </div>

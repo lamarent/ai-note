@@ -10,6 +10,12 @@ interface CardProps {
   footerClassName?: string;
   onClick?: () => void;
   hoverable?: boolean;
+  bordered?: boolean;
+  imageSrc?: string;
+  imageAlt?: string;
+  imageFull?: boolean;
+  compact?: boolean;
+  side?: boolean;
 }
 
 const Card: React.FC<CardProps> = ({
@@ -18,32 +24,44 @@ const Card: React.FC<CardProps> = ({
   footer,
   className = "",
   bodyClassName = "",
-  headerClassName = "",
-  footerClassName = "",
   onClick,
   hoverable = false,
+  bordered = true,
+  imageSrc,
+  imageAlt = "Card image",
+  imageFull = false,
+  compact = false,
+  side = false,
 }) => {
-  const cardClasses = `bg-white shadow rounded-lg overflow-hidden ${
-    hoverable ? "transition-shadow hover:shadow-md" : ""
-  } ${onClick ? "cursor-pointer" : ""} ${className}`;
+  const cardClasses = [
+    "card",
+    "bg-base-100",
+    bordered ? "border border-base-300" : "shadow-xl",
+    hoverable ? "hover:shadow-md transition-shadow" : "",
+    compact ? "card-compact" : "",
+    side ? "card-side" : "",
+    onClick ? "cursor-pointer" : "",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <div className={cardClasses} onClick={onClick}>
-      {title && (
-        <div
-          className={`px-4 py-3 border-b border-gray-200 ${headerClassName}`}
-        >
-          <h3 className="text-lg font-medium text-gray-800">{title}</h3>
-        </div>
+      {imageSrc && (
+        <figure className={imageFull ? "" : "px-10 pt-10"}>
+          <img
+            src={imageSrc}
+            alt={imageAlt}
+            className={imageFull ? "w-full" : "rounded-xl"}
+          />
+        </figure>
       )}
-      <div className={`p-4 ${bodyClassName}`}>{children}</div>
-      {footer && (
-        <div
-          className={`px-4 py-3 bg-gray-50 border-t border-gray-200 ${footerClassName}`}
-        >
-          {footer}
-        </div>
-      )}
+      <div className={`card-body ${bodyClassName}`}>
+        {title && <h2 className="card-title">{title}</h2>}
+        {children}
+        {footer && <div className="card-actions justify-end">{footer}</div>}
+      </div>
     </div>
   );
 };

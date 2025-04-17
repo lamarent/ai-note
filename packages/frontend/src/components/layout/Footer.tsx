@@ -8,24 +8,22 @@ const Footer: React.FC<FooterProps> = ({ showCopyright = true }) => {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-gray-200 py-4 mt-auto">
-      <div className="container mx-auto px-4 text-center text-gray-600">
-        {showCopyright && <p>&copy; {year} AI Brainstorm</p>}
-        <div className="mt-2 text-sm">
-          <a
-            href="#"
-            className="text-blue-600 hover:text-blue-800 transition-colors mr-4"
-          >
+    <footer className="footer footer-center p-10 bg-base-200 text-base-content mt-auto">
+      {showCopyright && (
+        <aside>
+          <p>&copy; {year} AI Brainstorm - All right reserved</p>
+        </aside>
+      )}
+      <nav>
+        <div className="grid grid-flow-col gap-4">
+          <a href="#" className="link link-hover">
             Terms of Service
           </a>
-          <a
-            href="#"
-            className="text-blue-600 hover:text-blue-800 transition-colors"
-          >
+          <a href="#" className="link link-hover">
             Privacy Policy
           </a>
         </div>
-      </div>
+      </nav>
     </footer>
   );
 };

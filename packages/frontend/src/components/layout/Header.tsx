@@ -11,39 +11,26 @@ const Header: React.FC<HeaderProps> = ({
   showNavigation = true,
 }) => {
   return (
-    <header className="bg-blue-600 text-white shadow-md">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <Link
-          to="/"
-          className="text-xl font-bold hover:text-blue-100 transition-colors"
-        >
+    <div className="navbar bg-primary text-primary-content shadow-md">
+      <div className="flex-1">
+        <Link to="/" className="btn btn-ghost text-xl">
           {title}
         </Link>
-
-        {showNavigation && (
-          <nav>
-            <ul className="flex space-x-6">
-              <li>
-                <Link
-                  to="/"
-                  className="hover:text-blue-100 transition-colors font-medium"
-                >
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/sessions"
-                  className="hover:text-blue-100 transition-colors font-medium"
-                >
-                  Sessions
-                </Link>
-              </li>
-            </ul>
-          </nav>
-        )}
       </div>
-    </header>
+
+      {showNavigation && (
+        <div className="flex-none">
+          <ul className="menu menu-horizontal px-1">
+            <li>
+              <Link to="/">Home</Link>
+            </li>
+            <li>
+              <Link to="/sessions">Sessions</Link>
+            </li>
+          </ul>
+        </div>
+      )}
+    </div>
   );
 };
 

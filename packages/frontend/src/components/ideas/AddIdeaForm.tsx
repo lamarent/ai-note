@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { CreateIdeaData } from "../../api/types";
 
 interface AddIdeaFormProps {
   sessionId: string;
@@ -24,7 +25,7 @@ const AddIdeaForm: React.FC<AddIdeaFormProps> = ({
     setIsSubmitting(true);
     setError(null);
 
-    const ideaData: Partial<CreateIdea> = {
+    const ideaData: CreateIdeaData = {
       content: content.trim(),
       sessionId,
       // Position would be added by the backend or set later when placing on the board
@@ -60,33 +61,58 @@ const AddIdeaForm: React.FC<AddIdeaFormProps> = ({
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow mb-6">
-      <h3 className="text-lg font-medium mb-3">Add New Idea</h3>
+    <div className="bg-base-200 p-4 rounded-lg mb-6">
+      <h3 className="text-lg font-medium mb-3 text-base-content">
+        Add New Idea
+      </h3>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded mb-4">
-          {error}
+        <div role="alert" className="alert alert-error mb-4">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="stroke-current shrink-0 h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span>Error: {error}</span>
         </div>
       )}
 
       <form onSubmit={handleSubmit}>
-        <div className="mb-4">
+        <div className="form-control mb-4">
           <textarea
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={`textarea textarea-bordered ${error ? "textarea-error" : ""}`}
             rows={3}
             placeholder="Type your idea here..."
             value={content}
             onChange={(e) => setContent(e.target.value)}
             disabled={isSubmitting}
+            aria-invalid={!!error}
+            aria-describedby={error ? "idea-error" : undefined}
           />
+          {error && (
+            <span id="idea-error" className="sr-only">
+              {error}
+            </span>
+          )}
         </div>
 
         <div className="flex justify-end">
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded font-medium disabled:opacity-50"
+            className="btn btn-primary"
             disabled={isSubmitting || !content.trim()}
           >
+            {isSubmitting && (
+              <span className="loading loading-spinner loading-xs mr-2"></span>
+            )}
             {isSubmitting ? "Adding..." : "Add Idea"}
           </button>
         </div>

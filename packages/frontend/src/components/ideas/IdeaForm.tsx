@@ -46,37 +46,38 @@ const IdeaForm: React.FC<IdeaFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label
-          htmlFor="content"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Idea Content
+      <div className="form-control">
+        <label htmlFor="content" className="label">
+          <span className="label-text">Idea Content</span>
         </label>
         <textarea
           id="content"
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          className="w-full rounded border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className={`textarea textarea-bordered ${error ? "textarea-error" : ""}`}
           rows={3}
           placeholder="Enter your idea here..."
           required
+          aria-invalid={!!error}
+          aria-describedby={error ? "content-error" : undefined}
         />
+        {error && (
+          <label className="label" id="content-error">
+            <span className="label-text-alt text-error">{error}</span>
+          </label>
+        )}
       </div>
 
       {categories.length > 0 && (
-        <div>
-          <label
-            htmlFor="category"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Category (optional)
+        <div className="form-control">
+          <label htmlFor="category" className="label">
+            <span className="label-text">Category (optional)</span>
           </label>
           <select
             id="category"
             value={categoryId || ""}
             onChange={(e) => setCategoryId(e.target.value || undefined)}
-            className="w-full rounded border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="select select-bordered"
           >
             <option value="">No Category</option>
             {categories.map((category) => (
@@ -87,8 +88,6 @@ const IdeaForm: React.FC<IdeaFormProps> = ({
           </select>
         </div>
       )}
-
-      {error && <div className="text-red-600 text-sm">{error}</div>}
 
       <div className="flex justify-end space-x-2">
         <Button variant="secondary" onClick={onCancel} type="button">

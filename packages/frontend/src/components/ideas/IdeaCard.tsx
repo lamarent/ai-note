@@ -35,10 +35,10 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
       })
     );
 
-    // Use a custom drag image
+    // Use a custom drag image with DaisyUI colors
     const dragImg = document.createElement("div");
     dragImg.className =
-      "w-48 h-24 bg-blue-100 rounded-lg opacity-70 flex items-center justify-center";
+      "w-48 h-24 bg-base-200 text-base-content rounded-lg opacity-80 flex items-center justify-center shadow-lg";
     dragImg.textContent = "Moving idea...";
     document.body.appendChild(dragImg);
     e.dataTransfer.setDragImage(dragImg, 24, 12);
@@ -49,14 +49,19 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
     }, 0);
   };
 
-  const colorBarStyle = categoryColor
-    ? { borderLeftColor: categoryColor, borderLeftWidth: "4px" }
+  // Use CSS variable for dynamic border color
+  const cardStyle = categoryColor
+    ? ({
+        "--category-color": categoryColor,
+        borderLeftWidth: "4px",
+        borderColor: "var(--category-color)",
+      } as React.CSSProperties)
     : {};
 
   return (
     <div
-      className={`idea-card ${className}`}
-      style={colorBarStyle}
+      className={`idea-card border-l-4 ${className}`}
+      style={cardStyle}
       draggable={isDraggable}
       onDragStart={handleDragStart}
       data-idea-id={idea.id}
@@ -65,22 +70,17 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
         className="relative shadow-md hover:shadow-lg transition-shadow"
         bodyClassName="p-3"
       >
-        <p className="text-gray-700 whitespace-pre-wrap">{idea.content}</p>
+        <p className="text-base-content whitespace-pre-wrap">{idea.content}</p>
 
-        <div className="flex justify-end mt-2 space-x-1">
-          <Button
-            size="sm"
-            variant="secondary"
-            onClick={() => onEdit(idea)}
-            className="opacity-60 hover:opacity-100"
-          >
+        <div className="card-actions justify-end mt-2 space-x-1">
+          <Button size="sm" variant="ghost" onClick={() => onEdit(idea)}>
             Edit
           </Button>
           <Button
             size="sm"
-            variant="danger"
+            variant="error"
+            ghost
             onClick={() => onDelete(idea)}
-            className="opacity-60 hover:opacity-100"
           >
             Delete
           </Button>

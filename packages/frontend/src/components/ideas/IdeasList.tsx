@@ -4,8 +4,9 @@ import {
   useCreateIdea,
   useDeleteIdea,
   useUpdateIdea,
-} from "../api/hooks";
-import { CreateIdeaData, UpdateIdeaData } from "../api/types";
+} from "../../api/hooks";
+import { CreateIdeaData, UpdateIdeaData } from "../../api/types";
+import Button from "../common/Button";
 
 interface IdeasListProps {
   sessionId: string;
@@ -79,93 +80,117 @@ export default function IdeasList({ sessionId }: IdeasListProps) {
     }
   };
 
-  if (isLoading) return <div className="mt-4">Loading ideas...</div>;
+  if (isLoading)
+    return (
+      <div className="flex justify-center items-center p-10">
+        <span className="loading loading-lg loading-spinner text-primary"></span>
+      </div>
+    );
 
   if (isError)
     return (
-      <div className="mt-4 text-red-500">
-        Error: {error instanceof Error ? error.message : "Failed to load ideas"}
+      <div role="alert" className="alert alert-error my-4">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="stroke-current shrink-0 h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <span>
+          Error:{" "}
+          {error instanceof Error ? error.message : "Failed to load ideas"}
+        </span>
       </div>
     );
 
   return (
-    <div className="mt-6">
+    <div className="mt-6 space-y-6">
       <h2 className="text-xl font-bold mb-4">Ideas</h2>
 
-      {/* Add new idea form */}
       <form onSubmit={handleCreateIdea} className="mb-6">
-        <div className="flex">
+        <div className="join w-full">
           <input
             type="text"
             value={newIdeaContent}
             onChange={(e) => setNewIdeaContent(e.target.value)}
             placeholder="Add a new idea..."
-            className="flex-1 px-3 py-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="input input-bordered join-item flex-grow"
             required
-          />
-          <button
-            type="submit"
             disabled={createIdeaMutation.isPending}
-            className="px-4 py-2 bg-green-500 text-white rounded-r-md hover:bg-green-600 disabled:bg-green-300"
+          />
+          <Button
+            type="submit"
+            className="join-item"
+            variant="primary"
+            isLoading={createIdeaMutation.isPending}
+            disabled={createIdeaMutation.isPending || !newIdeaContent.trim()}
           >
             {createIdeaMutation.isPending ? "Adding..." : "Add"}
-          </button>
+          </Button>
         </div>
       </form>
 
-      {/* Ideas list */}
       {ideas.length === 0 ? (
-        <p className="text-gray-500 italic">
+        <p className="text-base-content italic">
           No ideas yet. Add your first idea above!
         </p>
       ) : (
         <ul className="space-y-4">
           {ideas.map((idea) => (
-            <li
-              key={idea.id}
-              className="p-4 border rounded-md bg-white shadow-sm hover:shadow-md transition-shadow"
-            >
+            <li key={idea.id} className="p-4 rounded-md bg-base-200 shadow-sm">
               {editingIdeaId === idea.id ? (
                 <div className="space-y-2">
                   <textarea
                     value={editContent}
                     onChange={(e) => setEditContent(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-md"
+                    className="textarea textarea-bordered w-full"
                     rows={3}
                   />
-                  <div className="flex space-x-2">
-                    <button
+                  <div className="flex space-x-2 justify-end">
+                    <Button
                       onClick={() => handleUpdateIdea(idea.id)}
-                      disabled={updateIdeaMutation.isPending}
-                      className="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-blue-300"
+                      isLoading={updateIdeaMutation.isPending}
+                      disabled={
+                        updateIdeaMutation.isPending || !editContent.trim()
+                      }
+                      variant="primary"
+                      size="sm"
                     >
-                      {updateIdeaMutation.isPending ? "Saving..." : "Save"}
-                    </button>
-                    <button
-                      onClick={cancelEditing}
-                      className="px-3 py-1 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400"
-                    >
+                      Save
+                    </Button>
+                    <Button onClick={cancelEditing} variant="ghost" size="sm">
                       Cancel
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ) : (
                 <div>
-                  <p className="text-gray-800">{idea.content}</p>
-                  <div className="mt-2 flex justify-end space-x-2">
-                    <button
+                  <p className="text-base-content mb-2">{idea.content}</p>
+                  <div className="flex justify-end space-x-2">
+                    <Button
                       onClick={() => startEditing(idea.id, idea.content)}
-                      className="text-sm text-blue-500 hover:text-blue-700"
+                      variant="ghost"
+                      size="sm"
                     >
                       Edit
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => handleDeleteIdea(idea.id)}
+                      isLoading={deleteIdeaMutation.isPending}
+                      variant="ghost"
+                      size="sm"
+                      className="text-error"
                       disabled={deleteIdeaMutation.isPending}
-                      className="text-sm text-red-500 hover:text-red-700"
                     >
                       Delete
-                    </button>
+                    </Button>
                   </div>
                 </div>
               )}
