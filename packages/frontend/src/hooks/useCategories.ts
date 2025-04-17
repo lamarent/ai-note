@@ -1,195 +1,146 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiConfig, ApiResponse } from "../api/config";
-import { IDEA_KEYS } from "./useIdeas";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  UseMutationOptions,
+  UseQueryOptions,
+  QueryKey,
+} from "@tanstack/react-query";
+import { apiConfig, ApiResponse, ApiError } from "../services/api/config";
+import { Category, CreateCategory, UpdateCategory } from "@ai-brainstorm/types";
+import { categoryApi } from "../services/api/categoryApi";
 
-// Moved types from categoryApi.ts
-export interface Category {
-  id: string;
-  name: string;
-  color: string;
-  sessionId: string;
-  createdAt: string;
-  updatedAt: string;
+// Removed local interface Category
+
+// Re-use handleApiResponse (could be moved to a shared utils file later)
+async function handleApiResponse<T>(
+  responsePromise: Promise<ApiResponse<T>>
+): Promise<T> {
+  const response = await responsePromise;
+  if (response.success && response.data !== undefined) {
+    return response.data;
+  } else if (response.success && response.data === undefined) {
+    return {} as T;
+  }
+  throw new ApiError(
+    response.message || response.error || "API request failed",
+    response.status,
+    response.data
+  );
 }
 
-export interface CreateCategoryData {
-  name: string;
-  color: string;
-  sessionId: string;
-}
-
-export interface UpdateCategoryData {
-  name?: string;
-  color?: string;
-}
-// End of moved types
-
-// Query keys
-export const CATEGORY_KEYS = {
+// Define query keys
+const CATEGORY_KEYS = {
   all: ["categories"] as const,
   lists: () => [...CATEGORY_KEYS.all, "list"] as const,
-  list: (filters: Record<string, unknown>) =>
-    [...CATEGORY_KEYS.lists(), { filters }] as const,
-  bySession: (sessionId: string) =>
+  listBySession: (sessionId: string) =>
     [...CATEGORY_KEYS.lists(), { sessionId }] as const,
   details: () => [...CATEGORY_KEYS.all, "detail"] as const,
   detail: (id: string) => [...CATEGORY_KEYS.details(), id] as const,
 };
 
-/**
- * Hook to fetch all categories
- */
-export function useCategories() {
-  return useQuery({
-    queryKey: CATEGORY_KEYS.lists(),
-    queryFn: async () => {
-      const response = await apiConfig.get<Category[]>("/categories");
-      if (!response.success) {
-        throw new Error(response.error || "Failed to fetch categories");
-      }
-      return response.data as Category[];
-    },
-  });
-}
+// --- React Query Hooks --- //
 
-/**
- * Hook to fetch a single category by ID
- */
-export function useCategory(id: string) {
-  return useQuery({
+// Fetch all categories (or by session)
+export const useGetCategoriesBySession = (
+  sessionId: string,
+  options?: UseQueryOptions<Category[], ApiError>
+) => {
+  return useQuery<Category[], ApiError>({
+    queryKey: CATEGORY_KEYS.listBySession(sessionId),
+    queryFn: () => handleApiResponse(categoryApi.getBySessionId(sessionId)),
+    enabled: !!sessionId,
+    ...options,
+  });
+};
+
+// Fetch category by ID
+export const useGetCategoryById = (
+  id: string,
+  options?: UseQueryOptions<Category, ApiError>
+) => {
+  return useQuery<Category, ApiError>({
     queryKey: CATEGORY_KEYS.detail(id),
-    queryFn: async () => {
-      const response = await apiConfig.get<Category>(`/categories/${id}`);
-      if (!response.success) {
-        throw new Error(response.error || "Failed to fetch category");
-      }
-      return response.data as Category;
-    },
-    enabled: !!id, // Only run query if ID is provided
+    queryFn: () => handleApiResponse(categoryApi.getById(id)),
+    enabled: !!id,
+    ...options,
   });
-}
+};
 
-/**
- * Hook to create a new category
- */
-export function useCreateCategory() {
+// Create a new category
+export const useCreateCategory = (
+  options?: UseMutationOptions<Category, ApiError, CreateCategory>
+) => {
   const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: CreateCategoryData) => {
-      const response = await apiConfig.post<Category>("/categories", data);
-      if (!response.success) {
-        throw new Error(response.error || "Failed to create category");
-      }
-      return response.data as Category;
-    },
-    onSuccess: (newCategory) => {
-      // Invalidate categories list query to refetch
-      queryClient.invalidateQueries({ queryKey: CATEGORY_KEYS.lists() });
-
-      // If category is associated with a session, invalidate session categories
-      if (newCategory.sessionId) {
-        queryClient.invalidateQueries({
-          queryKey: CATEGORY_KEYS.bySession(newCategory.sessionId),
-        });
-      }
-    },
-  });
-}
-
-/**
- * Hook to update a category
- */
-export function useUpdateCategory(id: string) {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: UpdateCategoryData) => {
-      const response = await apiConfig.put<Category>(`/categories/${id}`, data);
-      if (!response.success) {
-        throw new Error(response.error || "Failed to update category");
-      }
-      return response.data as Category;
-    },
-    onSuccess: (updatedCategory) => {
-      // Update the category in the cache
-      queryClient.setQueryData(CATEGORY_KEYS.detail(id), updatedCategory);
-
-      // Invalidate categories list to refetch
-      queryClient.invalidateQueries({ queryKey: CATEGORY_KEYS.lists() });
-
-      // Invalidate session categories
-      if (updatedCategory.sessionId) {
-        queryClient.invalidateQueries({
-          queryKey: CATEGORY_KEYS.bySession(updatedCategory.sessionId),
-        });
-      }
-
-      // Invalidate ideas by category since the category name/color might have changed
+  return useMutation<Category, ApiError, CreateCategory>({
+    mutationFn: (data: CreateCategory) =>
+      handleApiResponse(categoryApi.create(data)),
+    onSuccess: (newCategory /* ... */) => {
       queryClient.invalidateQueries({
-        queryKey: IDEA_KEYS.byCategory(id),
+        queryKey: CATEGORY_KEYS.listBySession(newCategory.sessionId),
       });
+      // ... other onSuccess logic ...
     },
+    ...options,
   });
-}
+};
 
-/**
- * Hook to delete a category
- */
-export function useDeleteCategory() {
+// Update a category
+export const useUpdateCategory = (
+  options?: UseMutationOptions<
+    Category,
+    ApiError,
+    { id: string; data: UpdateCategory }
+  >
+) => {
   const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (id: string) => {
-      // Get the category first to know its session for cache invalidation
-      const categoryResponse = await apiConfig.get<Category>(
-        `/categories/${id}`
-      );
-      const category = categoryResponse.data;
-
-      if (!categoryResponse.success || !category) {
-        console.warn(
-          `Failed to fetch category ${id} before deleting, cache invalidation for session might be incomplete.`
-        );
-        // Decide if we should throw or continue
-      }
-
-      const response = await apiConfig.delete<{ success: boolean }>(
-        `/categories/${id}`
-      );
-      if (!response.success) {
-        throw new Error(response.error || "Failed to delete category");
-      }
-
-      // Return id and sessionId for cache invalidation
-      return {
-        id,
-        sessionId: category?.sessionId,
-      };
+  return useMutation<Category, ApiError, { id: string; data: UpdateCategory }>({
+    mutationFn: ({ id, data }) =>
+      handleApiResponse(categoryApi.update(id, data)),
+    onSuccess: (updatedCategory, variables /* ... */) => {
+      queryClient.invalidateQueries({
+        queryKey: CATEGORY_KEYS.listBySession(updatedCategory.sessionId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: CATEGORY_KEYS.detail(variables.id),
+      });
+      // ... other onSuccess logic ...
     },
-    onSuccess: ({ id, sessionId }) => {
-      // Remove the category from the cache
+    ...options,
+  });
+};
+
+// Delete a category
+export const useDeleteCategory = (
+  options?: UseMutationOptions<void, ApiError, string>
+) => {
+  const queryClient = useQueryClient();
+  // Need sessionId for invalidation
+  let sessionIdForInvalidation: string | undefined;
+
+  return useMutation<void, ApiError, string>({
+    onMutate: async (id: string) => {
+      try {
+        const category = await queryClient.fetchQuery<Category>({
+          queryKey: CATEGORY_KEYS.detail(id),
+          staleTime: 10000,
+        });
+        sessionIdForInvalidation = category?.sessionId;
+      } catch (e) {
+        console.error("Failed to get sessionId before deleting category", e);
+      }
+    },
+    mutationFn: (id: string) => handleApiResponse(categoryApi.delete(id)),
+    onSuccess: (data, id, context) => {
       queryClient.removeQueries({ queryKey: CATEGORY_KEYS.detail(id) });
-
-      // Invalidate categories list to refetch
-      queryClient.invalidateQueries({ queryKey: CATEGORY_KEYS.lists() });
-
-      // If we have the session ID, invalidate session categories
-      if (sessionId) {
+      if (sessionIdForInvalidation) {
         queryClient.invalidateQueries({
-          queryKey: CATEGORY_KEYS.bySession(sessionId),
+          queryKey: CATEGORY_KEYS.listBySession(sessionIdForInvalidation),
         });
       }
-
-      // Invalidate ideas by category since they might need to be uncategorized
-      queryClient.invalidateQueries({
-        queryKey: IDEA_KEYS.byCategory(id),
-      });
-
-      // Invalidate all ideas lists since some ideas might have changed category
-      queryClient.invalidateQueries({
-        queryKey: IDEA_KEYS.lists(),
-      });
+      // Consider invalidating broader session/idea queries if needed
+      options?.onSuccess?.(data, id, context);
     },
+    ...options,
   });
-}
+};

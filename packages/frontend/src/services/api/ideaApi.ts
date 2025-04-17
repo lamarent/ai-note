@@ -1,28 +1,5 @@
-import { apiClient } from "./client";
-
-// Types for the API
-export interface Idea {
-  id: string;
-  content: string;
-  sessionId: string;
-  position: { x: number; y: number };
-  categoryId?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface CreateIdeaInput {
-  content: string;
-  sessionId: string;
-  position?: { x: number; y: number };
-  categoryId?: string;
-}
-
-export interface UpdateIdeaInput {
-  content?: string;
-  position?: { x: number; y: number };
-  categoryId?: string | null;
-}
+import { apiConfig, ApiResponse } from "./config";
+import { Idea, CreateIdea, UpdateIdea } from "@ai-brainstorm/types";
 
 // API endpoints
 const IDEAS_ENDPOINT = "/api/ideas";
@@ -34,64 +11,57 @@ export const ideaApi = {
   /**
    * Get all ideas
    */
-  getAll: () => {
-    return apiClient.get<Idea[]>(IDEAS_ENDPOINT);
+  getAll: (sessionId: string) => {
+    return apiConfig.get<Idea[]>(`/api/sessions/${sessionId}/ideas`);
   },
 
   /**
    * Get an idea by ID
    */
   getById: (id: string) => {
-    return apiClient.get<Idea>(`${IDEAS_ENDPOINT}/${id}`);
+    return apiConfig.get<Idea>(`/api/ideas/${id}`);
   },
 
   /**
    * Create a new idea
    */
-  create: (data: CreateIdeaInput) => {
-    // Ensure position is set if not provided
-    const ideaData = {
-      ...data,
-      position: data.position || { x: 0, y: 0 },
-    };
-    return apiClient.post<Idea>(IDEAS_ENDPOINT, ideaData);
+  create: (data: CreateIdea) => {
+    return apiConfig.post<Idea>("/api/ideas", data);
   },
 
   /**
    * Update an idea
    */
-  update: (id: string, data: UpdateIdeaInput) => {
-    return apiClient.put<Idea>(`${IDEAS_ENDPOINT}/${id}`, data);
+  update: (id: string, data: UpdateIdea) => {
+    return apiConfig.put<Idea>(`/api/ideas/${id}`, data);
   },
 
   /**
    * Delete an idea
    */
   delete: (id: string) => {
-    return apiClient.delete(`${IDEAS_ENDPOINT}/${id}`);
+    return apiConfig.delete<void>(`/api/ideas/${id}`);
   },
 
   /**
    * Get ideas by session ID
    */
   getBySessionId: (sessionId: string) => {
-    return apiClient.get<Idea[]>(IDEAS_ENDPOINT, {
-      params: { sessionId },
-    });
+    return apiConfig.get<Idea[]>(`${IDEAS_ENDPOINT}?sessionId=${sessionId}`);
   },
 
   /**
    * Update multiple ideas at once (e.g., for bulk position updates)
    */
-  updateBulk: (ideas: { id: string; data: UpdateIdeaInput }[]) => {
-    return apiClient.post<Idea[]>(`${IDEAS_ENDPOINT}/bulk`, { ideas });
+  updateBulk: (ideas: { id: string; data: UpdateIdea }[]) => {
+    return apiConfig.post<Idea[]>(`${IDEAS_ENDPOINT}/bulk`, { ideas });
   },
 
   /**
    * Update idea position
    */
   updatePosition: (id: string, position: { x: number; y: number }) => {
-    return apiClient.patch<Idea>(`${IDEAS_ENDPOINT}/${id}/position`, {
+    return apiConfig.patch<Idea>(`${IDEAS_ENDPOINT}/${id}/position`, {
       position,
     });
   },

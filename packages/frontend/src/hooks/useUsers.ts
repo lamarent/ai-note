@@ -1,137 +1,111 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiConfig, ApiResponse } from "../api/config";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  UseMutationOptions,
+  UseQueryOptions,
+  QueryKey,
+} from "@tanstack/react-query";
+import { apiConfig, ApiResponse, ApiError } from "../services/api/config";
+import { userApi } from "../services/api/userApi";
+import { User, CreateUser, UpdateUser } from "@ai-brainstorm/types";
 
-// Moved types from userApi.ts - IMPORTANT: Export User
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  avatar?: string;
-  createdAt: string;
-  updatedAt: string;
+// Re-use handleApiResponse (could be moved to a shared utils file later)
+async function handleApiResponse<T>(
+  responsePromise: Promise<ApiResponse<T>>
+): Promise<T> {
+  const response = await responsePromise;
+  if (response.success && response.data !== undefined) {
+    return response.data;
+  } else if (response.success && response.data === undefined) {
+    return {} as T;
+  }
+  throw new ApiError(
+    response.message || response.error || "API request failed",
+    response.status,
+    response.data
+  );
 }
 
-export interface CreateUserData {
-  name: string;
-  email: string;
-  avatar?: string;
-}
-
-export interface UpdateUserData {
-  name?: string;
-  email?: string;
-  avatar?: string;
-}
-// End of moved types
-
-// Query keys
-export const USER_KEYS = {
+// Define query keys
+const USER_KEYS = {
   all: ["users"] as const,
   lists: () => [...USER_KEYS.all, "list"] as const,
-  list: (filters: Record<string, unknown>) =>
-    [...USER_KEYS.lists(), { filters }] as const,
   details: () => [...USER_KEYS.all, "detail"] as const,
   detail: (id: string) => [...USER_KEYS.details(), id] as const,
 };
 
-/**
- * Hook to fetch all users
- */
-export function useUsers() {
-  return useQuery({
+// --- React Query Hooks --- //
+
+export const useGetUsers = (
+  options?: Omit<UseQueryOptions<User[], ApiError>, "queryKey" | "queryFn">
+) => {
+  return useQuery<User[], ApiError>({
     queryKey: USER_KEYS.lists(),
-    queryFn: async () => {
-      const response = await apiConfig.get<User[]>("/users");
-      if (!response.success) {
-        throw new Error(response.error || "Failed to fetch users");
-      }
-      return response.data as User[];
-    },
+    queryFn: () => handleApiResponse(userApi.getAll()),
+    ...options,
   });
-}
+};
 
-/**
- * Hook to fetch a single user by ID
- */
-export function useUser(id: string) {
-  return useQuery({
+export const useGetUserById = (
+  id: string,
+  options?: Omit<
+    UseQueryOptions<User, ApiError>,
+    "queryKey" | "queryFn" | "enabled"
+  >
+) => {
+  return useQuery<User, ApiError>({
     queryKey: USER_KEYS.detail(id),
-    queryFn: async () => {
-      const response = await apiConfig.get<User>(`/users/${id}`);
-      if (!response.success) {
-        throw new Error(response.error || "Failed to fetch user");
-      }
-      return response.data as User;
-    },
-    enabled: !!id, // Only run query if ID is provided
+    queryFn: () => handleApiResponse(userApi.getById(id)),
+    enabled: !!id,
+    ...options,
   });
-}
+};
 
-/**
- * Hook to create a new user
- */
-export function useCreateUser() {
+export const useCreateUser = (
+  options?: UseMutationOptions<User, ApiError, CreateUser>
+) => {
   const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: CreateUserData) => {
-      const response = await apiConfig.post<User>("/users", data);
-      if (!response.success) {
-        throw new Error(response.error || "Failed to create user");
-      }
-      return response.data as User;
-    },
-    onSuccess: () => {
-      // Invalidate users list query to refetch
+  return useMutation<User, ApiError, CreateUser>({
+    mutationFn: (data: CreateUser) => handleApiResponse(userApi.create(data)),
+    onSuccess: (newUser, variables, context) => {
       queryClient.invalidateQueries({ queryKey: USER_KEYS.lists() });
+      queryClient.setQueryData(USER_KEYS.detail(newUser.id), newUser);
+      options?.onSuccess?.(newUser, variables, context);
     },
+    ...options,
   });
-}
+};
 
-/**
- * Hook to update a user
- */
-export function useUpdateUser(id: string) {
+export const useUpdateUser = (
+  options?: UseMutationOptions<User, ApiError, { id: string; data: UpdateUser }>
+) => {
   const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: UpdateUserData) => {
-      const response = await apiConfig.put<User>(`/users/${id}`, data);
-      if (!response.success) {
-        throw new Error(response.error || "Failed to update user");
-      }
-      return response.data as User;
-    },
-    onSuccess: (updatedUser) => {
-      // Update the user in the cache
-      queryClient.setQueryData(USER_KEYS.detail(id), updatedUser);
-      // Invalidate the list to refetch
+  return useMutation<User, ApiError, { id: string; data: UpdateUser }>({
+    mutationFn: ({ id, data }) => handleApiResponse(userApi.update(id, data)),
+    onSuccess: (updatedUser, variables, context) => {
       queryClient.invalidateQueries({ queryKey: USER_KEYS.lists() });
+      queryClient.invalidateQueries({
+        queryKey: USER_KEYS.detail(variables.id),
+      });
+      queryClient.setQueryData(USER_KEYS.detail(variables.id), updatedUser);
+      options?.onSuccess?.(updatedUser, variables, context);
     },
+    ...options,
   });
-}
+};
 
-/**
- * Hook to delete a user
- */
-export function useDeleteUser() {
+export const useDeleteUser = (
+  options?: UseMutationOptions<void, ApiError, string>
+) => {
   const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (id: string) => {
-      const response = await apiConfig.delete<{ success: boolean }>(
-        `/users/${id}`
-      );
-      if (!response.success) {
-        throw new Error(response.error || "Failed to delete user");
-      }
-      return id;
-    },
-    onSuccess: (deletedId) => {
-      // Remove the user from the cache
-      queryClient.removeQueries({ queryKey: USER_KEYS.detail(deletedId) });
-      // Invalidate the list to refetch
+  return useMutation<void, ApiError, string>({
+    mutationFn: (id: string) => handleApiResponse(userApi.delete(id)),
+    onSuccess: (data, id, context) => {
+      queryClient.removeQueries({ queryKey: USER_KEYS.detail(id) });
       queryClient.invalidateQueries({ queryKey: USER_KEYS.lists() });
+      options?.onSuccess?.(data, id, context);
     },
+    ...options,
   });
-}
+};
