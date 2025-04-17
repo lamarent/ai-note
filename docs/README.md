@@ -30,9 +30,9 @@ See the [Development Guide](./Development-Guide.md) for setup instructions.
 
 ## Documentation
 
-- [MVP Plan](./MVP-Plan.md)
+- [Product Specification](./Product-Specification.md)
 - [Architecture](./Architecture.md)
-- [Features](./Features.md)
 - [API Design](./API-Design.md)
 - [UI Design](./UI-Design.md)
 - [Development Guide](./Development-Guide.md)
+- [AI Assistant Workflow Guide](./guides/AI-Assistant-Workflow.md)

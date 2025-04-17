@@ -2,6 +2,25 @@
 
 This file tracks the development activities of the AI Brainstorm app in reverse chronological order (newest entries at the top).
 
+## 2025-XX-XX: Documentation & Context Restructuring
+
+- **Goal:** Restructure `docs` and `docs/context` for clarity and improved AI usability.
+- **Actions:**
+  - Created `docs/planning/001-docs-restructure-plan.md` detailing the plan.
+  - Merged `MVP-Plan.md` and `Features.md` into `docs/Product-Specification.md`.
+  - Created `docs/guides/` directory and moved relevant guides (`database.md`, `cloudflare-d1-migration.md`) into it.
+  - Restructured `docs/context/`:
+    - Renamed `development-log.md` to `00_development-log.md`.
+    - Created `knowledge-base/`, `state/`, `references/` directories.
+    - Merged specific context notes (e.g., database details) into `knowledge-base/`.
+    - Updated `docs/context/README.md` to reflect the new structure and usage.
+  - Deleted redundant files and the `docs/context/archive/` directory.
+  - Updated links in `docs/README.md`.
+  - Created `docs/guides/AI-Assistant-Workflow.md` to guide AI interactions with the new structure.
+  - Added link to the new AI guide in `docs/README.md`.
+- **Outcome:** Documentation is now more organized. The context system emphasizes `00_development-log.md` for chronology and `knowledge-base/` for persistent, topic-specific knowledge.
+- **Next Steps:** Utilize the new structure for ongoing development logging and context tracking.
+
 ## 2024-10-11: DaisyUI Refactoring
 
 - **Refactored frontend components to use DaisyUI:**
@@ -331,3 +350,5 @@ The API now follows a clean layered architecture:
   - Run `pnpm -r lint` to catch any issues.
   - Test UI layout, responsiveness, and DaisyUI theming across pages.
   - Remove `packages/frontend/src/api/types.ts` if it's still present and redundant.
+
+_Last updated: 2025-04-17_

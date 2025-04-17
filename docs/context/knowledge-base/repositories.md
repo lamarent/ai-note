@@ -130,3 +130,5 @@ Repositories pass through errors from Prisma. Common errors to handle:
 - Add error handling utilities
 - Add unit tests for repositories
 - Add validation using schemas from the types package
+
+_Last updated: 2025-04-17_
