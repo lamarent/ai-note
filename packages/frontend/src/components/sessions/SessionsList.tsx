@@ -1,23 +1,23 @@
 import { useState } from "react";
 import {
-  useSessions,
+  useGetSessions,
   useCreateSession,
   useDeleteSession,
 } from "../../hooks/useSessions"; // Corrected import path
-import { CreateSessionData, Session } from "../../api"; // Corrected import path and added Session type
+import { CreateSession, Session } from "@ai-brainstorm/types"; // Corrected import path and added Session type
 import Button from "../common/Button"; // Import refactored Button
 import { Link } from "react-router-dom"; // Import Link for navigation
 
 export default function SessionsList() {
   // Use title in state to match CreateSessionData
-  const [newSession, setNewSession] = useState<Partial<CreateSessionData>>({
+  const [newSession, setNewSession] = useState<Partial<CreateSession>>({
     title: "",
     description: "",
     isPublic: false, // Default value if needed
   });
 
   // Query to fetch sessions
-  const { data: sessions, isLoading, isError, error } = useSessions();
+  const { data: sessions, isLoading, isError, error } = useGetSessions();
 
   // Mutations for creating and deleting sessions
   const createSessionMutation = useCreateSession();
@@ -28,7 +28,7 @@ export default function SessionsList() {
     e.preventDefault();
     if (newSession.title?.trim()) {
       // Prepare data including required fields
-      const sessionData: CreateSessionData = {
+      const sessionData: CreateSession = {
         title: newSession.title.trim(),
         description: newSession.description?.trim() || undefined,
         ownerId: "00000000-0000-0000-0000-000000000000", // Placeholder ownerId

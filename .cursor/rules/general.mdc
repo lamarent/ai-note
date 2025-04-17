@@ -15,7 +15,8 @@ use pnpm
 auto run commands
 monorepo
 minimal, small wins, keep simple, runable, workable first
-always maintain development tracking: context, memory, plan, adr, knowledge, etc.
-summary, what next steps, remember always update context after each task done
+always development tracking: context, memory, plan, adr, knowledge, etc.
 read or search library doc before use
-use search or read tree file (should update) from doc instead of list items to reduce tool call
+use search or read tree file from doc instead of list items to reduce tool call
+follow [AI-Assistant-Workflow.md](mdc:docs/guides/AI-Assistant-Workflow.md)
+update context, summary, what next steps, remember always after each task done

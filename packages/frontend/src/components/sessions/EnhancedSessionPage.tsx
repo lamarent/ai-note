@@ -10,7 +10,7 @@ import {
   useCreateCategory,
   useUpdateCategory,
   useDeleteCategory,
-} from "../../api/hooks";
+} from "../../hooks";
 // Import DndKit components and hooks
 import {
   DndContext,

@@ -1,12 +1,12 @@
 import { useState } from "react";
 import {
-  useGetSessionIdeas,
+  useGetIdeasBySession,
   useCreateIdea,
   useDeleteIdea,
   useUpdateIdea,
-} from "../../api/hooks";
-import { CreateIdeaData, UpdateIdeaData } from "../../api/types";
+} from "../../hooks";
 import Button from "../common/Button";
+import { CreateIdea, UpdateIdea } from "@ai-brainstorm/types";
 
 interface IdeasListProps {
   sessionId: string;
@@ -18,7 +18,7 @@ export default function IdeasList({ sessionId }: IdeasListProps) {
     isLoading,
     isError,
     error,
-  } = useGetSessionIdeas(sessionId);
+  } = useGetIdeasBySession(sessionId);
   const createIdeaMutation = useCreateIdea();
   const updateIdeaMutation = useUpdateIdea();
   const deleteIdeaMutation = useDeleteIdea();
@@ -31,9 +31,10 @@ export default function IdeasList({ sessionId }: IdeasListProps) {
     e.preventDefault();
     if (!newIdeaContent.trim()) return;
 
-    const newIdea: CreateIdeaData = {
+    const newIdea: CreateIdea = {
       content: newIdeaContent.trim(),
       sessionId,
+      createdBy: userId,
     };
 
     createIdeaMutation.mutate(newIdea, {
@@ -56,7 +57,7 @@ export default function IdeasList({ sessionId }: IdeasListProps) {
   const handleUpdateIdea = (id: string) => {
     if (!editContent.trim()) return;
 
-    const updatedIdea: UpdateIdeaData = {
+    const updatedIdea: UpdateIdea = {
       content: editContent.trim(),
     };
 

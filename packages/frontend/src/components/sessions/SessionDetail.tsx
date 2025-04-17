@@ -1,11 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 import IdeasList from "../ideas/IdeasList";
-import {
-  useGetSession,
-  useDeleteSession,
-  useUpdateSession,
-} from "../../api/hooks";
+import { useGetSession, useDeleteSession, useUpdateSession } from "../../hooks";
 import { UpdateSessionData } from "../../api/types";
 import Button from "../common/Button"; // Import refactored Button
 

@@ -9,7 +9,7 @@ import {
   useGetSessions,
   useCreateSession,
   useDeleteSession,
-} from "../../services/queries/useSessions";
+} from "../../hooks/useSessions";
 import { format } from "date-fns";
 
 const SessionsListPage: React.FC = () => {

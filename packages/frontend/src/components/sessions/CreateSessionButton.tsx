@@ -1,6 +1,6 @@
 import React from "react";
-import { useSessionStore } from "../stores/sessionStore";
 import { CreateSession } from "@ai-brainstorm/types";
+import { useCreateSession } from "../../hooks/useSessions";
 
 interface CreateSessionButtonProps {
   onSessionCreated?: () => void;
@@ -9,9 +9,11 @@ interface CreateSessionButtonProps {
 export const CreateSessionButton: React.FC<CreateSessionButtonProps> = ({
   onSessionCreated,
 }) => {
-  const createSession = useSessionStore((state) => state.createSession);
-  const isLoading = useSessionStore((state) => state.isLoading);
-  const error = useSessionStore((state) => state.error);
+  const {
+    mutateAsync: createSessionMutation,
+    isPending: isCreating,
+    error: createSessionError,
+  } = useCreateSession();
 
   const handleCreateSession = async () => {
     // TODO: Get title from user input (e.g., a modal or form)
@@ -23,7 +25,7 @@ export const CreateSessionButton: React.FC<CreateSessionButtonProps> = ({
       isPublic: false, // Required by type, defaults to false
     };
 
-    const success = await createSession(sessionData);
+    const success = await createSessionMutation(sessionData);
 
     // Call the callback if provided and the session was created successfully
     if (success && onSessionCreated) {
@@ -36,11 +38,13 @@ export const CreateSessionButton: React.FC<CreateSessionButtonProps> = ({
       <button
         className="btn btn-primary"
         onClick={handleCreateSession}
-        disabled={isLoading}
+        disabled={isCreating}
       >
-        {isLoading ? "Creating..." : "Create New Session"}
+        {isCreating ? "Creating..." : "Create New Session"}
       </button>
-      {error && <p className="text-error mt-2">Error: {error}</p>}
+      {createSessionError && (
+        <p className="text-error mt-2">Error: {createSessionError.message}</p>
+      )}
     </div>
   );
 };

@@ -7,10 +7,10 @@ import Modal from "../../components/common/Modal";
 import Input from "../../components/forms/Input";
 import IdeasList from "../../components/ideas/IdeasList";
 import {
-  useGetSession,
+  useGetSessionById,
   useUpdateSession,
   useDeleteSession,
-} from "../../services/queries/useSessions";
+} from "../../hooks/useSessions";
 import { format } from "date-fns";
 
 const SessionDetailPage: React.FC = () => {
@@ -30,9 +30,7 @@ const SessionDetailPage: React.FC = () => {
     isLoading,
     error,
     isError,
-  } = useGetSession(sessionId || "", {
-    enabled: !!sessionId,
-  });
+  } = useGetSessionById(sessionId || "");
 
   // Update form data when session data is loaded
   useEffect(() => {
