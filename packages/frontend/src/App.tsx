@@ -1,11 +1,12 @@
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import SessionsList from "./components/SessionsList";
 import SessionPage from "./components/SessionPage";
+import SessionManager from "./components/SessionManager";
 
 const HomePage = () => {
   return (
     <div className="container mx-auto p-4 max-w-4xl">
-      <SessionsList />
+      <SessionManager />
     </div>
   );
 };
