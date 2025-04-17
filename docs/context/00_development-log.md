@@ -351,4 +351,13 @@ The API now follows a clean layered architecture:
   - Test UI layout, responsiveness, and DaisyUI theming across pages.
   - Remove `packages/frontend/src/api/types.ts` if it's still present and redundant.
 
+## 2025-01-15: Frontend Structure & Type Refactoring
+
+- Refactored `packages/frontend/src` structure to align with `frontend-structure.md` (moved `constants.ts` to `lib/constants.ts`, organized `components/layout`, relocated `api/` into `services/` and added `services/queries`).
+- Completed `apiConfig` in `services/api/config.ts` with fetch, get, post, put, patch, delete and error handling.
+- Updated API service files (`userApi.ts`, `sessionApi.ts`, `ideaApi.ts`, `categoryApi.ts`) to use `apiConfig` and return `ApiResponse<T>`.
+- Refactored React Query hooks (`useUsers.ts`, `useSessions.ts`, `useIdeas.ts`, `useCategories.ts`) to remove local types, import shared types from `@ai-brainstorm/types`, and use a helper for consistent API responses.
+- Cleaned up deprecated files and fixed import paths.
+- Ran linter and resolved errors across services and hooks.
+
 _Last updated: 2025-04-17_
