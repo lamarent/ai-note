@@ -1,12 +1,12 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { zValidator } from "@hono/zod-validator";
+// import { zValidator } from "@hono/zod-validator"; // Unused import
 import {
-  CreateSessionSchema,
-  UpdateSessionSchema,
-  CreateIdeaSchema,
-  UpdateIdeaSchema,
-  formatZodError,
+  // CreateSessionSchema, // Unused import
+  // UpdateSessionSchema, // Unused import
+  // CreateIdeaSchema,    // Unused import
+  // UpdateIdeaSchema,    // Unused import
+  // formatZodError,      // Unused import
   CreateSession,
   UpdateSession,
   CreateIdea,

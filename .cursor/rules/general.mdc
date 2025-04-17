@@ -16,8 +16,9 @@ auto run commands
 monorepo
 minimal, small wins, keep simple, runable, workable first
 wireframe, workflow first, enhance or advance later
+unstyle, simple, layout first
 always development tracking: context, memory, plan, adr, knowledge, etc.
 read or search library doc before use
-use [list-files-command.md](mdc:docs/context/list-files-command.md) in start to list items dir
-follow [AI-Assistant-Workflow.md](mdc:docs/guides/AI-Assistant-Workflow.md)
+use [list-files-command.md](mdc:docs/context/list-files-command.md) when start to list all items in codebase
+follow [AI-Assistant-Workflow.md](mdc:docs/AI-Assistant-Workflow.md)
 update context, summary, what next steps, remember always after each task done

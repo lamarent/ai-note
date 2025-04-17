@@ -1,6 +1,6 @@
 # @ai-brainstorm/database
 
-Database package for AI Note application using Prisma with Cloudflare D1.
+Database package for AI Brainstorm application using Prisma with Cloudflare D1.
 
 ## Setup
 

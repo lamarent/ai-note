@@ -10,7 +10,6 @@ import {
   useDeleteSession,
 } from "../../hooks/useSessions";
 import { format } from "date-fns";
-import Header from "../../components/layout/Header";
 
 const SessionsListPage: React.FC = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -80,7 +79,6 @@ const SessionsListPage: React.FC = () => {
 
   return (
     <>
-      <Header title="Sessions" />
       <div className="container mx-auto px-4 py-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Sessions</h1>
@@ -122,9 +120,7 @@ const SessionsListPage: React.FC = () => {
 
         {!isLoading && !isError && sessions.length === 0 && (
           <Card className="p-8 text-center">
-            <p className="text-gray-500 mb-4">
-              No brainstorming sessions found.
-            </p>
+            <p className="mb-4">No brainstorming sessions found.</p>
             <Button onClick={() => setIsCreateModalOpen(true)}>
               Create Your First Session
             </Button>
@@ -155,10 +151,8 @@ const SessionsListPage: React.FC = () => {
                 </div>
               }
             >
-              <p className="text-gray-600 mb-2 line-clamp-2">
-                {session.description}
-              </p>
-              <div className="flex justify-between text-sm text-gray-500 mt-4">
+              <p className=" mb-2 line-clamp-2">{session.description}</p>
+              <div className="flex justify-between text-sm  mt-4">
                 <span>{session.isPublic ? "Public" : "Private"}</span>
                 <span>
                   {format(new Date(session.createdAt), "MMM d, yyyy")}
@@ -204,7 +198,7 @@ const SessionsListPage: React.FC = () => {
             <div className="w-full">
               <label
                 htmlFor="description"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium   mb-1"
               >
                 Description
               </label>
@@ -230,10 +224,7 @@ const SessionsListPage: React.FC = () => {
                 onChange={handleInputChange}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
-              <label
-                htmlFor="isPublic"
-                className="ml-2 block text-sm text-gray-700"
-              >
+              <label htmlFor="isPublic" className="ml-2 block text-sm  ">
                 Make this session public
               </label>
             </div>

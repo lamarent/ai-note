@@ -4,9 +4,8 @@ import {
   useQueryClient,
   UseMutationOptions,
   UseQueryOptions,
-  QueryKey,
 } from "@tanstack/react-query";
-import { apiConfig, ApiResponse, ApiError } from "../services/api/config";
+import { ApiResponse, ApiError } from "../services/api/config";
 import { userApi } from "../services/api/userApi";
 import { User, CreateUser, UpdateUser } from "@ai-brainstorm/types";
 

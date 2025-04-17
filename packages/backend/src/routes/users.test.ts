@@ -19,8 +19,8 @@ vi.mock("@ai-brainstorm/database", () => {
 
 describe("User Routes", () => {
   let app: Hono;
-  let mockEnv: any;
-  let mockUserRepo: any;
+  let mockEnv: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  let mockUserRepo: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
   beforeEach(() => {
     // Reset mocks
@@ -34,7 +34,7 @@ describe("User Routes", () => {
     app.route("/", userRoutes);
 
     // Get the mocked repository
-    mockUserRepo = new UserRepository({} as any) as any;
+    mockUserRepo = new UserRepository({} as any) as any; // eslint-disable-line @typescript-eslint/no-explicit-any
   });
 
   describe("GET /", () => {
@@ -44,7 +44,7 @@ describe("User Routes", () => {
         { id: "1", name: "User 1", email: "user1@example.com" },
         { id: "2", name: "User 2", email: "user2@example.com" },
       ];
-      mockUserRepo.findAll.mockResolvedValue(mockUsers);
+      (mockUserRepo.findAll as any).mockResolvedValue(mockUsers); // eslint-disable-line @typescript-eslint/no-explicit-any
 
       // Act
       const res = await app.request("/", {

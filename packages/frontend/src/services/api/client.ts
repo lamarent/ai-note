@@ -48,6 +48,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
  * Creates a URL with query parameters
  */
 function createUrl(endpoint: string, params?: Record<string, any>): string {
+   
   const url = new URL(endpoint, API_BASE_URL);
 
   if (params) {
@@ -119,7 +120,7 @@ export const apiClient = {
    */
   post<T>(
     endpoint: string,
-    data: any,
+    data: any,  
     options: RequestOptions = {}
   ): Promise<T> {
     const { headers, params, ...rest } = options;
@@ -138,7 +139,7 @@ export const apiClient = {
    */
   put<T>(
     endpoint: string,
-    data: any,
+    data: any,  
     options: RequestOptions = {}
   ): Promise<T> {
     const { headers, params, ...rest } = options;
@@ -157,7 +158,7 @@ export const apiClient = {
    */
   patch<T>(
     endpoint: string,
-    data: any,
+    data: any,  
     options: RequestOptions = {}
   ): Promise<T> {
     const { headers, params, ...rest } = options;

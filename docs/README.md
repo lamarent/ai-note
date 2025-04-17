@@ -35,4 +35,4 @@ See the [Development Guide](./Development-Guide.md) for setup instructions.
 - [API Design](./API-Design.md)
 - [UI Design](./UI-Design.md)
 - [Development Guide](./Development-Guide.md)
-- [AI Assistant Workflow Guide](./guides/AI-Assistant-Workflow.md)
+- [AI Assistant Workflow Guide](./AI-Assistant-Workflow.md)

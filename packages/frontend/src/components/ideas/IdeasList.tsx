@@ -13,9 +13,10 @@ import IdeaCard from "./IdeaCard";
 
 interface IdeasListProps {
   sessionId: string;
+  onIdeaSelect?: (idea: Idea) => void;
 }
 
-export default function IdeasList({ sessionId }: IdeasListProps) {
+export default function IdeasList({ sessionId, onIdeaSelect }: IdeasListProps) {
   const {
     data: ideas = [],
     isLoading,
@@ -45,6 +46,13 @@ export default function IdeasList({ sessionId }: IdeasListProps) {
       deleteIdeaMutation.mutate(deleteModalIdeaId, {
         onSuccess: () => setDeleteModalIdeaId(null),
       });
+    }
+  };
+
+  // Handle clicks on idea cards for selection
+  const handleIdeaCardClick = (idea: Idea) => {
+    if (onIdeaSelect) {
+      onIdeaSelect(idea);
     }
   };
 
@@ -117,6 +125,8 @@ export default function IdeasList({ sessionId }: IdeasListProps) {
               idea={idea as Idea}
               onEdit={() => setEditingIdeaId(idea.id)}
               onDelete={(ideaToDelete) => setDeleteModalIdeaId(ideaToDelete.id)}
+              onClick={() => handleIdeaCardClick(idea as Idea)}
+              isSelectable={!!onIdeaSelect}
             />
           )
         )}

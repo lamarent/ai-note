@@ -1,23 +1,19 @@
 import js from "@eslint/js";
 import tseslint from "typescript-eslint";
+import globals from "globals";
 
 export default tseslint.config(
-  {
-    ignores: ["dist"],
-  },
+  { ignores: ["dist", "node_modules", ".wrangler"] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    files: ["**/*.ts"],
     languageOptions: {
-      parserOptions: {
-        project: "./tsconfig.json",
-        sourceType: "module",
-        ecmaVersion: 2020,
+      globals: {
+        ...globals.node, // Add node globals
       },
     },
     rules: {
-      ...tseslint.configs.strict.rules,
+      // Add specific backend rules here if needed
     },
   }
 );

@@ -3,6 +3,7 @@ export * from "./useSessions";
 export * from "./useCategories";
 export * from "./useIdeas";
 export * from "./useUsers";
+export * from "./useAI";
 
 // Optionally re-export specific types if commonly used
 // export type { Session } from './useSessions';

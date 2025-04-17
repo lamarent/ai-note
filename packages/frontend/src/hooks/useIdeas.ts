@@ -5,7 +5,7 @@ import {
   UseMutationOptions,
   UseQueryOptions,
 } from "@tanstack/react-query";
-import { apiConfig, ApiResponse, ApiError } from "../services/api/config";
+import { /* apiConfig, */ ApiResponse, ApiError } from "../services/api/config";
 import { ideaApi } from "../services/api/ideaApi";
 import { Idea, CreateIdea, UpdateIdea } from "@ai-brainstorm/types";
 
@@ -204,7 +204,7 @@ export const useDeleteIdea = (
     onSuccess: (data, id, context) => {
       options?.onSuccess?.(data, id, context);
     },
-    onSettled: (data, error, id, context) => {
+    onSettled: (data, error, id /*, context */) => {
       // Remove the idea from cache
       queryClient.removeQueries({ queryKey: IDEA_KEYS.detail(id) });
 

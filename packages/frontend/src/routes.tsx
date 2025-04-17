@@ -1,5 +1,6 @@
 import { RouteObject } from "react-router-dom";
 import React from "react";
+import LoadingFallback from "./components/common/LoadingFallback";
 
 // Lazy load pages for better performance
 const HomePage = React.lazy(() => import("./pages/home/HomePage"));
@@ -11,11 +12,11 @@ const SessionDetailPage = React.lazy(
 );
 
 // Fallback component while loading lazy-loaded pages
-const LoadingFallback = () => (
-  <div className="flex justify-center items-center h-screen">
-    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-  </div>
-);
+// const LoadingFallback = () => (
+//   <div className="flex justify-center items-center h-screen">
+//     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+//   </div>
+// );
 
 // Define routes
 const routes: RouteObject[] = [

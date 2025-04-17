@@ -60,9 +60,10 @@ export interface ApiResponse<T> {
  */
 export class ApiError extends Error {
   status: number;
-  data?: any;
+  data?: any;  
 
   constructor(message: string, status: number, data?: any) {
+     
     super(message);
     this.name = "ApiError";
     this.status = status;
@@ -127,14 +128,15 @@ export const apiConfig = {
       const response = await fetch(url, mergedOptions);
       clearTimeout(timeoutId);
 
-      let responseData: any = null;
+      let responseData: any = null;  
       const contentType = response.headers.get("content-type");
 
       // Try to parse JSON only if the content type indicates it
       if (contentType && contentType.includes("application/json")) {
         try {
           responseData = await response.json();
-        } catch (parseError) {
+        } catch /* (parseError) */ {
+          // Removed unused parseError
           // Handle cases where parsing fails despite content type header
           return {
             success: false,
@@ -211,7 +213,7 @@ export const apiConfig = {
 
   async post<T>(
     endpoint: string,
-    data: any,
+    data: any,  
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     return this.fetchApi<T>(endpoint, {
@@ -223,7 +225,7 @@ export const apiConfig = {
 
   async put<T>(
     endpoint: string,
-    data: any,
+    data: any,  
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     return this.fetchApi<T>(endpoint, {
@@ -235,7 +237,7 @@ export const apiConfig = {
 
   async patch<T>(
     endpoint: string,
-    data: any,
+    data: any,  
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     return this.fetchApi<T>(endpoint, {

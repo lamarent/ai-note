@@ -12,6 +12,7 @@ export const IdeaSchema = z.object({
       y: z.number(),
     })
     .optional(),
+  isAiGenerated: z.boolean().default(false),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
@@ -19,8 +20,11 @@ export const IdeaSchema = z.object({
 export const CreateIdeaSchema = IdeaSchema.omit({
   id: true,
   upvotes: true,
+  isAiGenerated: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  isAiGenerated: z.boolean().default(false).optional(),
 });
 
 export const UpdateIdeaSchema = z.object({
@@ -32,6 +36,7 @@ export const UpdateIdeaSchema = z.object({
       y: z.number(),
     })
     .optional(),
+  isAiGenerated: z.boolean().optional(),
 });
 
 export type Idea = z.infer<typeof IdeaSchema>;

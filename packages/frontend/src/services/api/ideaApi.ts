@@ -1,4 +1,4 @@
-import { apiConfig, ApiResponse } from "./config";
+import { apiConfig /*, ApiResponse */ } from "./config";
 import { Idea, CreateIdea, UpdateIdea } from "@ai-brainstorm/types";
 
 // API endpoints

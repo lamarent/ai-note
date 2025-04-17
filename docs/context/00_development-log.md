@@ -371,4 +371,39 @@ The API now follows a clean layered architecture:
   - Verified existing hooks (`useIdeas.ts`) and components (`IdeasList`, `IdeaForm`, `IdeaItem`, `IdeaCard`) cover basic CRUD.
   - Refined `IdeasList.tsx` to use `IdeaCard` instead of `IdeaItem` for visual consistency.
 
+## 2023-08-22: Core Features Implementation
+
+Today I implemented the core features of the AI Brainstorm application:
+
+1. **Home Page Enhancement**
+
+   - Redesigned the home page with a cleaner layout
+   - Added feature showcase cards
+   - Added recent sessions section with mock data
+   - Improved call-to-action buttons
+
+2. **AI-Powered Idea Generation**
+
+   - Created AI API service and hooks (useGenerateIdeas, useExpandIdea)
+   - Implemented AIGenerationPanel component with support for different brainstorming techniques
+   - Added ability to select and expand existing ideas
+
+3. **Export Functionality**
+
+   - Implemented export utilities for Markdown and JSON formats
+   - Created ExportPanel component with preview capabilities
+   - Added copy to clipboard functionality
+   - Integrated export functionality into session detail page
+
+4. **Improved Session Detail Page**
+   - Implemented tabbed interface for ideas, AI assistance, and export
+   - Added idea selection for AI operations
+   - Enhanced metadata display
+
+Next steps:
+
+- Refactor styles to use DaisyUI dark theme consistently
+- Set up real API integration
+- Implement idea categorization and drag-and-drop
+
 _Last updated: 2025-04-17_

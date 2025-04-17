@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import Header from "../../components/layout/Header";
+// import Header from "../../components/layout/Header"; // Removed unused import
 import Button from "../../components/common/Button";
 import Card from "../../components/common/Card";
 import Modal from "../../components/common/Modal";
 import Input from "../../components/forms/Input";
 import IdeasList from "../../components/ideas/IdeasList";
+import AIGenerationPanel from "../../components/ideas/AIGenerationPanel";
+import ExportPanel from "../../components/sessions/ExportPanel";
 import {
   useGetSessionById,
   useUpdateSession,
   useDeleteSession,
-} from "../../hooks/useSessions";
+  useGetIdeasBySession,
+} from "../../hooks";
+import { Idea } from "@ai-brainstorm/types";
 import { format } from "date-fns";
 
 // Extracted SessionHeader component to simplify header rendering
@@ -25,7 +29,7 @@ const SessionHeader: React.FC<SessionHeaderProps> = ({
   onDelete,
 }) => (
   <div className="flex justify-between items-center mb-6">
-    <h1 className="text-2xl font-bold text-gray-800">{title}</h1>
+    <h1 className="text-2xl font-bold">{title}</h1>
     <div className="flex space-x-2">
       <Button variant="secondary" onClick={onEdit} aria-label="Edit session">
         Edit
@@ -52,12 +56,10 @@ const SessionMetadata: React.FC<SessionMetadataProps> = ({
 }) => (
   <Card className="mb-6">
     <div className="mb-4">
-      <h2 className="text-lg font-medium text-gray-700 mb-2">Description</h2>
-      <p className="text-gray-600">
-        {description || "No description provided."}
-      </p>
+      <h2 className="text-lg font-medium mb-2">Description</h2>
+      <p>{description || "No description provided."}</p>
     </div>
-    <div className="flex justify-between text-sm text-gray-500 border-t border-gray-200 pt-4 mt-4">
+    <div className="flex justify-between text-sm opacity-70 border-t border-base-300 pt-4 mt-4">
       <div>
         <span className="font-medium">Status:</span>{" "}
         {isPublic ? "Public" : "Private"}
@@ -84,17 +86,25 @@ const SessionDetailPage: React.FC = () => {
     description: "",
     isPublic: true,
   });
+  const [selectedIdea, setSelectedIdea] = useState<Idea | undefined>(undefined);
 
   // Fetch session details
   const {
     data: session,
-    isLoading,
-    error,
-    isError,
+    isLoading: isSessionLoading,
+    error: sessionError,
+    isError: isSessionError,
   } = useGetSessionById(sessionId || "");
 
+  // Fetch ideas for this session (to provide for AI expansion and selection)
+  const { data: ideas = [], isLoading: isIdeasLoading } = useGetIdeasBySession(
+    sessionId || ""
+  );
+
   // Tab state for switching panels
-  const [activeTab, setActiveTab] = useState<"ideas" | "ai">("ideas");
+  const [activeTab, setActiveTab] = useState<"ideas" | "ai" | "export">(
+    "ideas"
+  );
 
   // Update form data when session data is loaded
   useEffect(() => {
@@ -150,30 +160,37 @@ const SessionDetailPage: React.FC = () => {
     }
   };
 
-  if (isLoading) {
+  // Handle idea selection for AI operations
+  const handleIdeaSelect = (idea: Idea) => {
+    setSelectedIdea(idea);
+    // If we're not already on the AI tab, switch to it
+    if (activeTab !== "ai") {
+      setActiveTab("ai");
+    }
+  };
+
+  if (isSessionLoading || isIdeasLoading) {
     return (
       <>
-        <Header title="Loading Session..." />
         <div className="container mx-auto px-4 py-6">
           <div className="flex justify-center py-8">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            <div className="loading loading-spinner loading-lg"></div>
           </div>
         </div>
       </>
     );
   }
 
-  if (isError || !session) {
+  if (isSessionError || !session) {
     const errorMessage =
-      error instanceof Error
-        ? error.message
+      sessionError instanceof Error
+        ? sessionError.message
         : "Session not found or unknown error";
     return (
       <>
-        <Header title="Error" />
         <div className="container mx-auto px-4 py-6">
-          <Card className="bg-red-50 border border-red-200 mb-6">
-            <div className="text-red-600">
+          <Card className="alert alert-error mb-6">
+            <div>
               <p>Error loading session: {errorMessage}</p>
               <Button
                 variant="secondary"
@@ -191,7 +208,6 @@ const SessionDetailPage: React.FC = () => {
 
   return (
     <>
-      <Header title={session.title || "Session Detail"} />
       <div className="container mx-auto px-4 py-6">
         <div className="max-w-4xl mx-auto">
           <SessionHeader
@@ -206,7 +222,7 @@ const SessionDetailPage: React.FC = () => {
             updatedAt={new Date(session.updatedAt)}
           />
           {/* Tabs for navigation */}
-          <div className="tabs mb-6" role="tablist">
+          <div className="tabs tabs-bordered mb-6" role="tablist">
             <button
               className={`tab ${activeTab === "ideas" ? "tab-active" : ""}`}
               role="tab"
@@ -223,22 +239,44 @@ const SessionDetailPage: React.FC = () => {
               aria-controls="ai-panel"
               onClick={() => setActiveTab("ai")}
             >
-              AI Suggestions
+              AI Assistance
+            </button>
+            <button
+              className={`tab ${activeTab === "export" ? "tab-active" : ""}`}
+              role="tab"
+              aria-selected={activeTab === "export"}
+              aria-controls="export-panel"
+              onClick={() => setActiveTab("export")}
+            >
+              Export
             </button>
           </div>
           {/* Panel content */}
-          {activeTab === "ideas" ? (
+          {activeTab === "ideas" && (
             <div id="ideas-panel" role="tabpanel">
               <div className="mb-6">
-                <IdeasList sessionId={session.id} />
+                {/* Pass onIdeaSelect to IdeasList */}
+                <IdeasList
+                  sessionId={session.id}
+                  onIdeaSelect={handleIdeaSelect}
+                />
               </div>
             </div>
-          ) : (
+          )}
+
+          {activeTab === "ai" && (
             <div id="ai-panel" role="tabpanel" className="mb-6">
-              {/* Placeholder for AI-powered idea suggestions */}
-              <p className="text-gray-600 italic">
-                AI-powered suggestions will appear here.
-              </p>
+              <AIGenerationPanel
+                sessionId={session.id}
+                sessionTitle={session.title}
+                selectedIdea={selectedIdea}
+              />
+            </div>
+          )}
+
+          {activeTab === "export" && (
+            <div id="export-panel" role="tabpanel" className="mb-6">
+              <ExportPanel session={session} ideas={ideas} />
             </div>
           )}
 
@@ -278,7 +316,7 @@ const SessionDetailPage: React.FC = () => {
               <div className="w-full">
                 <label
                   htmlFor="description"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium mb-1"
                 >
                   Description
                 </label>
@@ -290,7 +328,7 @@ const SessionDetailPage: React.FC = () => {
                     setFormData({ ...formData, description: e.target.value })
                   }
                   rows={3}
-                  className="w-full rounded border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="textarea textarea-bordered w-full"
                   placeholder="Enter session description"
                 />
               </div>
@@ -302,18 +340,15 @@ const SessionDetailPage: React.FC = () => {
                   name="isPublic"
                   checked={formData.isPublic}
                   onChange={handleInputChange}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="checkbox"
                 />
-                <label
-                  htmlFor="isPublic"
-                  className="ml-2 block text-sm text-gray-700"
-                >
+                <label htmlFor="isPublic" className="ml-2 block text-sm">
                   Make this session public
                 </label>
               </div>
 
               {updateSession.isError && (
-                <div className="text-red-600 text-sm">
+                <div className="text-error text-sm">
                   {updateSession.error?.message ||
                     "An error occurred while updating the session"}
                 </div>
@@ -345,14 +380,12 @@ const SessionDetailPage: React.FC = () => {
             }
           >
             <p>
-              Are you sure you want to delete <strong>{session.title}</strong>?
-              This action cannot be undone.
+              Are you sure you want to delete this session? This will also
+              delete all ideas associated with it. This action cannot be undone.
             </p>
-
             {deleteSession.isError && (
-              <div className="mt-4 text-red-600 text-sm">
-                {deleteSession.error?.message ||
-                  "An error occurred while deleting the session"}
+              <div className="mt-4 text-error text-sm">
+                {deleteSession.error?.message}
               </div>
             )}
           </Modal>

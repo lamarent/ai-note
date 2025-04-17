@@ -4,9 +4,8 @@ import {
   useQueryClient,
   UseMutationOptions,
   UseQueryOptions,
-  QueryKey,
 } from "@tanstack/react-query";
-import { apiConfig, ApiResponse, ApiError } from "../services/api/config";
+import { ApiResponse, ApiError } from "../services/api/config";
 import { Category, CreateCategory, UpdateCategory } from "@ai-brainstorm/types";
 import { categoryApi } from "../services/api/categoryApi";
 

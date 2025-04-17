@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Validates data against a schema and returns the result
@@ -9,7 +9,7 @@ import { z } from 'zod';
 export function validateData<T>(schema: z.ZodType<T>, data: unknown): T | null {
   try {
     return schema.parse(data);
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -20,8 +20,11 @@ export function validateData<T>(schema: z.ZodType<T>, data: unknown): T | null {
  * @param data The data to validate
  * @returns Object containing the validated data and/or errors
  */
-export function validateWithErrors<T>(schema: z.ZodType<T>, data: unknown): { 
-  data: T | null; 
+export function validateWithErrors<T>(
+  schema: z.ZodType<T>,
+  data: unknown
+): {
+  data: T | null;
   success: boolean;
   errors: z.ZodError | null;
 } {
@@ -30,20 +33,20 @@ export function validateWithErrors<T>(schema: z.ZodType<T>, data: unknown): {
     return {
       data: validData,
       success: true,
-      errors: null
+      errors: null,
     };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return {
         data: null,
         success: false,
-        errors: error
+        errors: error,
       };
     }
     return {
       data: null,
       success: false,
-      errors: null
+      errors: null,
     };
   }
 }
@@ -55,14 +58,14 @@ export function validateWithErrors<T>(schema: z.ZodType<T>, data: unknown): {
  */
 export function formatZodError(error: z.ZodError): Record<string, string[]> {
   const formattedErrors: Record<string, string[]> = {};
-  
+
   error.errors.forEach((err) => {
-    const path = err.path.join('.');
+    const path = err.path.join(".");
     if (!formattedErrors[path]) {
       formattedErrors[path] = [];
     }
     formattedErrors[path].push(err.message);
   });
-  
+
   return formattedErrors;
-} 
+}
