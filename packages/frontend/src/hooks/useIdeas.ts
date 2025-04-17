@@ -204,7 +204,7 @@ export const useDeleteIdea = (
     onSuccess: (data, id, context) => {
       options?.onSuccess?.(data, id, context);
     },
-    onSettled: (data, error, id /*, context */) => {
+    onSettled: (_data, _error, id /*, context */) => {
       // Remove the idea from cache
       queryClient.removeQueries({ queryKey: IDEA_KEYS.detail(id) });
 

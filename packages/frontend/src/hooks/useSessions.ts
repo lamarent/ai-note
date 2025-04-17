@@ -150,7 +150,7 @@ export const useUpdateSession = (
 
       options?.onSuccess?.(updatedSession, variables, context);
     },
-    onSettled: (data, error, variables) => {
+    onSettled: (data, _error, variables) => {
       // Force refetch regardless of outcome
       queryClient.invalidateQueries({
         queryKey: SESSION_KEYS.detail(variables.id),
@@ -179,7 +179,7 @@ export const useDeleteSession = (
     onSuccess: (data, id, context) => {
       options?.onSuccess?.(data, id, context);
     },
-    onSettled: (data, error, id) => {
+    onSettled: (_data, _error, id) => {
       // Force remove and invalidate
       queryClient.removeQueries({ queryKey: SESSION_KEYS.detail(id) });
       queryClient.invalidateQueries({ queryKey: SESSION_KEYS.lists() });

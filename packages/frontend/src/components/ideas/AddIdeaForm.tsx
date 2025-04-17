@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { CreateIdeaData } from "../../api/types";
+import { CreateIdea } from "@ai-brainstorm/types";
 
 interface AddIdeaFormProps {
   sessionId: string;
@@ -25,7 +25,7 @@ const AddIdeaForm: React.FC<AddIdeaFormProps> = ({
     setIsSubmitting(true);
     setError(null);
 
-    const ideaData: CreateIdeaData = {
+    const ideaData: CreateIdea = {
       content: content.trim(),
       sessionId,
       // Position would be added by the backend or set later when placing on the board
