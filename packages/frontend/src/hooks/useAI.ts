@@ -1,50 +1,8 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
-import { apiConfig, ApiResponse, ApiError } from "../services/api/config";
+import { ApiResponse, ApiError } from "../services/api/config";
 import { Idea } from "@ai-brainstorm/types";
-
-// API Endpoints
-const AI_ENDPOINT = "/api/ai";
-
-// API client for AI operations
-const aiApi = {
-  // Generate ideas based on a prompt
-  generateIdeas: (payload: {
-    sessionId: string;
-    prompt: string;
-    context?: string;
-    technique?: string;
-    count?: number;
-  }) => {
-    return apiConfig.post<Idea[]>(`${AI_ENDPOINT}/generate`, payload);
-  },
-
-  // Expand on a specific idea
-  expandIdea: (payload: {
-    ideaId: string;
-    sessionId: string;
-    depth?: number;
-  }) => {
-    return apiConfig.post<Idea[]>(`${AI_ENDPOINT}/expand`, payload);
-  },
-
-  // Get alternative perspectives on an idea
-  getAlternativePerspectives: (payload: {
-    ideaId: string;
-    sessionId: string;
-    count?: number;
-  }) => {
-    return apiConfig.post<Idea[]>(`${AI_ENDPOINT}/perspectives`, payload);
-  },
-
-  // Refine or improve an idea
-  refineIdea: (payload: {
-    ideaId: string;
-    sessionId: string;
-    instructions: string;
-  }) => {
-    return apiConfig.post<Idea>(`${AI_ENDPOINT}/refine`, payload);
-  },
-};
+import { aiApi } from "../services/api/aiApi";
+import { useApiKey } from "./useApiKey";
 
 // Helper function to handle API responses
 async function handleApiResponse<T>(
@@ -63,6 +21,22 @@ async function handleApiResponse<T>(
   );
 }
 
+// Hook for validating API key
+export const useValidateApiKey = (
+  options?: UseMutationOptions<{ valid: boolean }, ApiError, string>
+) => {
+  return useMutation<{ valid: boolean }, ApiError, string>({
+    mutationFn: (apiKey) => handleApiResponse(aiApi.validateApiKey(apiKey)),
+    ...options,
+  });
+};
+
+// Hook for checking if the user has set an API key
+export const useCheckApiKey = () => {
+  const { hasApiKey } = useApiKey();
+  return { hasApiKey };
+};
+
 // Hook for generating new ideas
 export const useGenerateIdeas = (
   options?: UseMutationOptions<
@@ -77,6 +51,8 @@ export const useGenerateIdeas = (
     }
   >
 ) => {
+  const { hasApiKey } = useCheckApiKey();
+
   return useMutation<
     Idea[],
     ApiError,
@@ -88,7 +64,15 @@ export const useGenerateIdeas = (
       count?: number;
     }
   >({
-    mutationFn: (payload) => handleApiResponse(aiApi.generateIdeas(payload)),
+    mutationFn: (payload) => {
+      if (!hasApiKey) {
+        throw new ApiError(
+          "API key is required. Please set it in the settings page.",
+          400
+        );
+      }
+      return handleApiResponse(aiApi.generateIdeas(payload));
+    },
     ...options,
   });
 };
@@ -101,20 +85,32 @@ export const useExpandIdea = (
     {
       ideaId: string;
       sessionId: string;
+      idea: string;
       depth?: number;
     }
   >
 ) => {
+  const { hasApiKey } = useCheckApiKey();
+
   return useMutation<
     Idea[],
     ApiError,
     {
       ideaId: string;
       sessionId: string;
+      idea: string;
       depth?: number;
     }
   >({
-    mutationFn: (payload) => handleApiResponse(aiApi.expandIdea(payload)),
+    mutationFn: (payload) => {
+      if (!hasApiKey) {
+        throw new ApiError(
+          "API key is required. Please set it in the settings page.",
+          400
+        );
+      }
+      return handleApiResponse(aiApi.expandIdea(payload));
+    },
     ...options,
   });
 };
@@ -127,21 +123,32 @@ export const useAlternativePerspectives = (
     {
       ideaId: string;
       sessionId: string;
+      idea: string;
       count?: number;
     }
   >
 ) => {
+  const { hasApiKey } = useCheckApiKey();
+
   return useMutation<
     Idea[],
     ApiError,
     {
       ideaId: string;
       sessionId: string;
+      idea: string;
       count?: number;
     }
   >({
-    mutationFn: (payload) =>
-      handleApiResponse(aiApi.getAlternativePerspectives(payload)),
+    mutationFn: (payload) => {
+      if (!hasApiKey) {
+        throw new ApiError(
+          "API key is required. Please set it in the settings page.",
+          400
+        );
+      }
+      return handleApiResponse(aiApi.getAlternativePerspectives(payload));
+    },
     ...options,
   });
 };
@@ -154,20 +161,32 @@ export const useRefineIdea = (
     {
       ideaId: string;
       sessionId: string;
+      idea: string;
       instructions: string;
     }
   >
 ) => {
+  const { hasApiKey } = useCheckApiKey();
+
   return useMutation<
     Idea,
     ApiError,
     {
       ideaId: string;
       sessionId: string;
+      idea: string;
       instructions: string;
     }
   >({
-    mutationFn: (payload) => handleApiResponse(aiApi.refineIdea(payload)),
+    mutationFn: (payload) => {
+      if (!hasApiKey) {
+        throw new ApiError(
+          "API key is required. Please set it in the settings page.",
+          400
+        );
+      }
+      return handleApiResponse(aiApi.refineIdea(payload));
+    },
     ...options,
   });
 };

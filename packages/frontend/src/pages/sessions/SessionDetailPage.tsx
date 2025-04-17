@@ -6,13 +6,16 @@ import Card from "../../components/common/Card";
 import Modal from "../../components/common/Modal";
 import Input from "../../components/forms/Input";
 import IdeasList from "../../components/ideas/IdeasList";
-import AIGenerationPanel from "../../components/ideas/AIGenerationPanel";
+// import AIGenerationPanel from "../../components/ideas/AIGenerationPanel";
+import AIToolsPanel from "../../components/ai/AIToolsPanel";
 import ExportPanel from "../../components/sessions/ExportPanel";
 import {
   useGetSessionById,
   useUpdateSession,
   useDeleteSession,
   useGetIdeasBySession,
+  useCreateIdea,
+  useUpdateIdea,
 } from "../../hooks";
 import { Idea } from "@ai-brainstorm/types";
 import { format } from "date-fns";
@@ -131,6 +134,10 @@ const SessionDetailPage: React.FC = () => {
     },
   });
 
+  // Create and update idea mutations for AI-generated content
+  const createIdea = useCreateIdea();
+  const updateIdea = useUpdateIdea();
+
   // Form handlers
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -167,6 +174,39 @@ const SessionDetailPage: React.FC = () => {
     if (activeTab !== "ai") {
       setActiveTab("ai");
     }
+  };
+
+  // Handler for AI-generated ideas
+  const handleIdeasGenerated = (newIdeas: Idea[]) => {
+    if (!sessionId) return;
+
+    // Create each idea in the database
+    newIdeas.forEach((idea) => {
+      createIdea.mutate({
+        sessionId,
+        content: idea.content,
+        position: idea.position || { x: 0, y: 0 },
+        isAiGenerated: true,
+        categoryId: idea.categoryId,
+      });
+    });
+  };
+
+  // Handler for AI-refined idea
+  const handleIdeaRefined = (refinedIdea: Idea) => {
+    if (!sessionId || !selectedIdea) return;
+
+    // Update the selected idea with the refined content
+    updateIdea.mutate({
+      id: selectedIdea.id,
+      data: {
+        content: refinedIdea.content,
+        isAiGenerated: true,
+      },
+    });
+
+    // Clear the selection after refining
+    setSelectedIdea(undefined);
   };
 
   if (isSessionLoading || isIdeasLoading) {
@@ -266,10 +306,11 @@ const SessionDetailPage: React.FC = () => {
 
           {activeTab === "ai" && (
             <div id="ai-panel" role="tabpanel" className="mb-6">
-              <AIGenerationPanel
+              <AIToolsPanel
                 sessionId={session.id}
-                sessionTitle={session.title}
                 selectedIdea={selectedIdea}
+                onIdeasGenerated={handleIdeasGenerated}
+                onIdeaRefined={handleIdeaRefined}
               />
             </div>
           )}

@@ -41,7 +41,6 @@
     - _(Optional future step: Pass `categoryColor` if categories are implemented)_
 
 2.  **(Future) Implement Category Management:** Add functionality to create, assign, and filter by categories.
-3.  **(Future) Implement Drag-and-Drop:** Utilize `IdeaCard`'s `isDraggable` prop.
 
 **Next Steps:**
 

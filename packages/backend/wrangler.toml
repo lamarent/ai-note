@@ -14,7 +14,10 @@ port = 8787
 
 # Bindings for development
 [vars]
-# OPENAI_API_KEY = "your_dev_openai_key"
+# OpenAI API configuration
+AI_API_URL = "https://api.openai.com/v1"
+AI_MODEL = "gpt-3.5-turbo"
+# AI_API_KEY = "your_dev_openai_key" # Uncomment and set for local development
 
 # D1 Database binding
 [[d1_databases]]

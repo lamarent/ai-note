@@ -2,6 +2,46 @@
 
 This file tracks the development activities of the AI Brainstorm app in reverse chronological order (newest entries at the top).
 
+## 2025-05-01: AI Service Implementation
+
+- **Implemented AI service integration:**
+  - Created `AIService` class in `packages/backend/src/services/ai.ts` to interface with OpenAI
+  - Implemented four core AI features:
+    - `generateIdeas`: Generate new ideas based on a prompt
+    - `expandIdea`: Create related ideas branching from an existing idea
+    - `getAlternativePerspectives`: See an idea from different viewpoints
+    - `refineIdea`: Improve existing ideas based on instructions
+  - Added support for different brainstorming techniques (General, SCAMPER, Lateral Thinking, Six Thinking Hats, 5W1H)
+- **Created AI routes in backend:**
+
+  - Added `packages/backend/src/routes/ai.ts` with endpoints:
+    - `POST /api/ai/generate`: Generate ideas from prompts
+    - `POST /api/ai/expand`: Expand existing ideas
+    - `POST /api/ai/perspectives`: Get alternative perspectives
+    - `POST /api/ai/refine`: Refine ideas based on instructions
+  - Integrated AI routes with IdeaRepository to save AI-generated ideas
+  - Added proper error handling and type validation
+
+- **Environment configuration:**
+
+  - Updated `wrangler.toml` with AI service configuration
+  - Updated environment type definitions in `index.ts`
+  - Added proper environment variables for AI API key, URL, and model
+
+- **Technical details:**
+
+  - Used OpenAI Chat Completions API with structured JSON response format
+  - Implemented proper error handling for API failures
+  - Added fallback responses for parsing errors
+  - Ensured all AI-generated ideas are properly typed and compatible with database schemas
+
+- **Next steps:**
+  - Add API rate limiting and caching to optimize API usage
+  - Add more advanced prompt engineering for better AI responses
+  - Create frontend UI for all AI-related features
+  - Implement response streaming for large idea generation
+  - Add unit tests for AI service functionality
+
 ## 2025-XX-XX: Documentation & Context Restructuring
 
 - **Goal:** Restructure `docs` and `docs/context` for clarity and improved AI usability.
@@ -407,3 +447,113 @@ Next steps:
 - Implement idea categorization and drag-and-drop
 
 _Last updated: 2025-04-17_
+
+## 2023-XX-XX: Completed AI Tools Integration
+
+### Task
+
+Completed all AI UI components and integrated them with the session detail page.
+
+### Changes Made
+
+1. Created `AIAlternativePerspectives` component for generating alternative viewpoints on ideas
+2. Created `AIIdeaRefinement` component for refining and improving ideas
+3. Designed `AIToolsPanel` that combines all AI features in a tabbed interface
+4. Integrated the AI Tools Panel into the session detail page
+5. Added handlers for processing AI-generated or refined ideas
+6. Implemented proper UX with loading states, error handling, and validation
+
+### Technical Decisions
+
+- Used a tabbed interface to organize different AI tools
+- Created consistent UI patterns across all AI components
+- Implemented conditional rendering based on selected idea state
+- Added clear error messages and loading indicators for better UX
+- Used session and idea mutations to persist AI-generated content
+
+### Next Steps
+
+- Implement categories management
+- Enhance the visual workspace for idea positioning
+- Add testing for AI components
+- Consider adding AI-generated visualizations or summaries
+
+## 2023-XX-XX: Implemented Initial AI UI Components
+
+### Task
+
+Created initial AI-powered UI components to demonstrate API key integration.
+
+### Changes Made
+
+1. Implemented `AIGenerationPanel` component for generating new ideas
+2. Created `AIIdeaExpander` component for expanding existing ideas
+3. Integrated API key validation and error handling
+4. Added `ApiKeyWarning` to provide feedback when API key is missing
+
+### Technical Decisions
+
+- Used React Query for managing async state
+- Implemented proper error handling for API calls
+- Created reusable UI patterns for consistency
+- Integrated with the API key infrastructure
+
+### Next Steps
+
+- Add these components to the session detail page
+- Implement remaining AI UI components (alternative perspectives, idea refinement)
+- Add proper UI for displaying AI-generated content
+- Create testing for API integration
+
+## 2023-XX-XX: API Key Integration with AI Services
+
+### Task
+
+Integrated API key storage with AI service calls to enable secure authentication for AI features.
+
+### Changes Made
+
+1. Created a new AI API service in `packages/frontend/src/services/api/aiApi.ts` that integrates the API key from local storage
+2. Added API key validation in API calls with appropriate error handling
+3. Updated `useAI.ts` hooks to check for API key presence before making API calls
+4. Enhanced the settings page with validation for API key format and server validation
+5. Created `ApiKeyWarning` component to display warning when API key is missing
+
+### Technical Decisions
+
+- API key is passed in request headers as 'X-API-Key'
+- Added client-side validation for API key format
+- Created fallback behavior if validation endpoint is not available
+- Implemented consistent error handling for missing API keys
+
+### Next Steps
+
+- Add UI components that use the AI features
+- Create AI-powered idea generation and enhancement interfaces
+- Add more advanced validation for specific API key formats
+
+## 2023-XX-XX: Implemented Settings Page for API Key Storage
+
+### Task
+
+Created a settings page for users to input and store their AI service API key in local storage.
+
+### Changes Made
+
+1. Created a new settings page component at `packages/frontend/src/pages/settings/SettingsPage.tsx`
+2. Added a utility for local storage operations: `packages/frontend/src/utils/localStorage.ts`
+3. Created a custom hook `useApiKey` at `packages/frontend/src/hooks/useApiKey.ts` for accessing API key across the application
+4. Added a new route for the settings page in `packages/frontend/src/routes.tsx`
+5. Updated the sidebar navigation to include a link to the settings page
+
+### Technical Decisions
+
+- API key is stored in the browser's local storage for persistence
+- The key is stored securely using a password input field, but note that local storage is not fully secure
+- Added a custom hook to make the API key easily accessible throughout the application
+
+### Next Steps
+
+- Integrate the API key with AI service calls
+- Add validation for API key format
+- Consider more secure storage options if needed

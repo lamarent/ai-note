@@ -16,6 +16,11 @@ const Sidebar: React.FC = () => {
             Sessions
           </Link>
         </li>
+        <li>
+          <Link to="/settings" className="menu-item">
+            Settings
+          </Link>
+        </li>
       </ul>
     </aside>
   );

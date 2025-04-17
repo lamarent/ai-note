@@ -37,6 +37,24 @@ This document tracks the implementation progress of the frontend components and 
 - ✅ Idea editing form
 - ✅ Idea deletion with confirmation
 
+### Settings & Configuration
+
+- ✅ Settings page
+- ✅ API key storage using local storage
+- ✅ API key management utilities
+- ✅ API key integration with AI service
+- ✅ API key validation
+
+### AI-Powered Features
+
+- ✅ API key warning component
+- ✅ AI idea generation component
+- ✅ AI idea expansion component
+- ✅ AI alternative perspectives component
+- ✅ AI idea refinement component
+- ✅ Combined AI tools panel with idea selection
+- ✅ Integration with session detail page
+
 ## In Progress Features
 
 ### Categories Management
@@ -49,7 +67,6 @@ This document tracks the implementation progress of the frontend components and 
 
 ### Enhanced Ideas UI
 
-- ⏳ Draggable idea cards
 - ⏳ Visual workspace for idea positioning
 - ⏳ Idea relationships/connections
 - ⏳ Rich text formatting for ideas

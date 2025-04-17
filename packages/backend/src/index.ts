@@ -18,6 +18,8 @@ import userRoutes from "./routes/users";
 import sessionRoutes from "./routes/sessions";
 import categoryRoutes from "./routes/categories";
 import ideaRoutes from "./routes/ideas";
+import aiRoutes from "./routes/ai";
+
 // Define the expected environment bindings
 // See https://hono.dev/getting-started/cloudflare-workers#bindings
 export type Env = {
@@ -31,7 +33,11 @@ export type Env = {
   // MY_BUCKET: R2Bucket
   // Example binding to AI Gateway. Learn more at https://developers.cloudflare.com/ai-gateway/
   // AI: Ai
-  // OPENAI_API_KEY: string
+
+  // OpenAI API configuration
+  AI_API_KEY: string;
+  AI_API_URL: string;
+  AI_MODEL?: string;
 };
 
 // Define the combined shape of possible validated data
@@ -48,7 +54,7 @@ app.use(
   cors({
     origin: "*", // Adjust this to your specific frontend domain in production
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowHeaders: ["Content-Type", "Authorization"],
+    allowHeaders: ["Content-Type", "Authorization", "X-API-Key"],
   })
 );
 
@@ -65,6 +71,7 @@ app.route("/api/users", userRoutes);
 app.route("/api/sessions", sessionRoutes);
 app.route("/api/categories", categoryRoutes);
 app.route("/api/ideas", ideaRoutes);
+app.route("/api/ai", aiRoutes);
 
 // Error handling
 app.onError((error, c) => {
