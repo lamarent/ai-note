@@ -1,5 +1,4 @@
 import { create, StateCreator } from "zustand";
-import { Session, CreateSession } from "@ai-brainstorm/types";
 
 interface SessionState {
   sessions: Session[];

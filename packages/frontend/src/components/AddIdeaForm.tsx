@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { CreateIdea } from "@ai-brainstorm/types";
 
 interface AddIdeaFormProps {
   sessionId: string;

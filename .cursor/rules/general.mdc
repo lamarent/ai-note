@@ -6,7 +6,7 @@ alwaysApply: true
 always say "General rule applied" at begin response
 ai-assisted development first
 autonomous mode
-create context tracking for ai-assisted development
+always context tracking for ai-assisted development in docs/context folder
 always read docs folder, context files, relate docs carefully before take actions
 always create markdown files for planning, context tracking and document completely before code implement or user request code or implement
 keep running until done, nonstop

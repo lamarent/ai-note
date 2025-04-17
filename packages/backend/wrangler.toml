@@ -22,6 +22,10 @@ binding = "DB"
 database_name = "ai_brainstorm"
 database_id = "ai_brainstorm_db" # Replace with actual ID after creating the database
 migrations_dir = "../database/prisma/migrations"
+migrations_table = "prisma_migrations"
+
+# [triggers]
+# crons = [ ]
 
 # Example KV Namespace binding for dev
 # [[kv_namespaces]]

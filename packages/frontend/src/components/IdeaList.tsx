@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Idea, Category } from "@ai-brainstorm/types";
 
 // Extended Idea type to include the category relation that comes from the API
 interface IdeaWithCategory extends Idea {
