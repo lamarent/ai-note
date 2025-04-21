@@ -1,8 +1,11 @@
+import type { ApiKeyEntry } from "../types/apiKey";
+
 // Local storage keys
 const STORAGE_KEYS = {
   API_KEY: "ai-brainstorm-api-key",
   PROVIDER: "ai-brainstorm-ai-provider",
   MODEL: "ai-brainstorm-ai-model",
+  API_KEY_ENTRIES: "ai-brainstorm-api-key-entries",
 };
 
 /**
@@ -60,6 +63,38 @@ export const getModel = (): string | null => {
   return localStorage.getItem(STORAGE_KEYS.MODEL);
 };
 
+export const getApiKeyEntries = (): ApiKeyEntry[] => {
+  const entries = localStorage.getItem(STORAGE_KEYS.API_KEY_ENTRIES);
+  if (!entries) return [];
+  try {
+    return JSON.parse(entries);
+  } catch {
+    return [];
+  }
+};
+
+export const saveApiKeyEntries = (entries: ApiKeyEntry[]): void => {
+  localStorage.setItem(STORAGE_KEYS.API_KEY_ENTRIES, JSON.stringify(entries));
+};
+
+export const addApiKeyEntry = (entry: ApiKeyEntry): void => {
+  const entries = getApiKeyEntries();
+  entries.push(entry);
+  saveApiKeyEntries(entries);
+};
+
+export const removeApiKeyEntry = (id: string): void => {
+  const entries = getApiKeyEntries().filter((e) => e.id !== id);
+  saveApiKeyEntries(entries);
+};
+
+export const updateApiKeyEntry = (entry: ApiKeyEntry): void => {
+  const entries = getApiKeyEntries().map((e) =>
+    e.id === entry.id ? entry : e
+  );
+  saveApiKeyEntries(entries);
+};
+
 export default {
   saveApiKey,
   getApiKey,
@@ -68,4 +103,9 @@ export default {
   getProvider,
   saveModel,
   getModel,
+  getApiKeyEntries,
+  saveApiKeyEntries,
+  addApiKeyEntry,
+  removeApiKeyEntry,
+  updateApiKeyEntry,
 };
