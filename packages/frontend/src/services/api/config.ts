@@ -141,7 +141,7 @@ export const apiConfig = {
             success: false,
             status: response.status, // Still report original status
             error: "Failed to parse JSON response",
-            message: ERROR_MESSAGES.DEFAULT,
+            message: responseData?.error || ERROR_MESSAGES.DEFAULT,
           };
         }
       }
@@ -155,11 +155,12 @@ export const apiConfig = {
         const errorPayload = responseData || {}; // Use parsed JSON error if available
         const errorMessage =
           errorPayload.error || errorPayload.message || response.statusText;
+
         return {
           success: false,
           status: response.status,
           error: errorMessage,
-          message: errorPayload.message || ERROR_MESSAGES.DEFAULT, // Prefer server message
+          message: errorMessage.error || errorMessage || ERROR_MESSAGES.DEFAULT, // Prefer server message
           data: responseData, // Include error data if present
         };
       }
@@ -194,7 +195,7 @@ export const apiConfig = {
           success: false,
           status: err.status || 0,
           error: err.message || ERROR_MESSAGES.DEFAULT,
-          message: ERROR_MESSAGES.DEFAULT,
+          message: err.message || ERROR_MESSAGES.DEFAULT,
         };
       }
     }

@@ -10,9 +10,9 @@ import {
 import { useValidateApiKey } from "../../hooks/useAI";
 
 const AI_PROVIDERS = [
+  { id: "openrouter", name: "OpenRouter" },
   { id: "openai", name: "OpenAI" },
   { id: "anthropic", name: "Anthropic" },
-  { id: "openrouter", name: "OpenRouter" },
 ];
 
 const SettingsPage: React.FC = () => {
@@ -161,19 +161,6 @@ const SettingsPage: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="form-control w-full">
               <label className="label">
-                <span className="label-text">AI Service API Key</span>
-              </label>
-              <input
-                type="password"
-                placeholder="Enter your API key"
-                className={`input input-bordered w-full ${validationError ? "input-error" : ""}`}
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-              />
-            </div>
-
-            <div className="form-control w-full">
-              <label className="label">
                 <span className="label-text">AI Provider</span>
               </label>
               <select
@@ -187,6 +174,33 @@ const SettingsPage: React.FC = () => {
                   </option>
                 ))}
               </select>
+            </div>
+
+            {provider === "openrouter" && (
+              <div className="text-sm text-gray-500 mt-1">
+                To get an OpenRouter API key, sign up at{" "}
+                <a
+                  href="https://openrouter.ai/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="link link-primary"
+                >
+                  openrouter.ai
+                </a>{" "}
+                and generate a key in your Dashboard.
+              </div>
+            )}
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text">AI Service API Key</span>
+              </label>
+              <input
+                type="password"
+                placeholder="Enter your API key"
+                className={`input input-bordered w-full ${validationError ? "input-error" : ""}`}
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+              />
             </div>
 
             <div className="form-control w-full">

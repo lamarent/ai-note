@@ -82,7 +82,7 @@ const AIGenerationPanel: React.FC<AIGenerationPanelProps> = ({
               value={context}
               onChange={(e) => setContext(e.target.value)}
               placeholder="Any additional information or constraints..."
-              className="textarea textarea-bordered h-24"
+              className="textarea textarea-bordered h-24 w-full"
             />
           </div>
 

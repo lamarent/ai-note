@@ -90,9 +90,8 @@ ai.post("/generate", async (c) => {
     );
 
     return c.json(savedIdeas, 201);
-  } catch (error) {
-    console.error("Error generating ideas:", error);
-    return c.json({ error: "Failed to generate ideas" }, 500);
+  } catch (error: any) {
+    return c.json({ error: error.message }, 500);
   }
 });
 

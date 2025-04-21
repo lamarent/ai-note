@@ -129,36 +129,39 @@ const SessionsListPage: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {sessions.map((session) => (
-            <Card
+            <Link
               key={session.id}
-              title={session.title}
-              className="hover:shadow-md transition-shadow"
-              footer={
-                <div className="flex justify-between items-center w-full">
-                  <Link
-                    to={`/sessions/${session.id}`}
-                    className="text-blue-600 hover:text-blue-800 transition-colors"
-                  >
-                    View Details
-                  </Link>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={() => handleDeleteClick(session.id)}
-                  >
-                    Delete
-                  </Button>
-                </div>
-              }
+              to={`/sessions/${session.id}`}
+              className="block"
             >
-              <p className=" mb-2 line-clamp-2">{session.description}</p>
-              <div className="flex justify-between text-sm  mt-4">
-                <span>{session.isPublic ? "Public" : "Private"}</span>
-                <span>
-                  {format(new Date(session.createdAt), "MMM d, yyyy")}
-                </span>
-              </div>
-            </Card>
+              <Card
+                title={session.title}
+                className="hover:shadow-md transition-shadow cursor-pointer"
+                footer={
+                  <div className="flex justify-end w-full">
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleDeleteClick(session.id);
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                }
+              >
+                <p className="mb-2 line-clamp-2">{session.description}</p>
+                <div className="flex justify-between text-sm mt-4">
+                  <span>{session.isPublic ? "Public" : "Private"}</span>
+                  <span>
+                    {format(new Date(session.createdAt), "MMM d, yyyy")}
+                  </span>
+                </div>
+              </Card>
+            </Link>
           ))}
         </div>
 
