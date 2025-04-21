@@ -86,13 +86,17 @@ export class AIService {
     // Format user prompt
     const userPrompt = `Generate ${count} creative ideas for the following brainstorming topic: "${prompt}".
 ${context ? `Additional context: ${context}` : ""}
-Each idea should be unique and innovative. Format your response as a JSON array where each object has:
-- content: The idea text (short title)
-- description: A brief explanation or expansion of the idea
-- position: { x: 0, y: 0 } (This is just a placeholder)`;
+Each idea should be unique and innovative.
+Respond with only valid JSON. Format the response as a JSON array of objects with the following properties:
+  - content: The idea text (short title)
+  - description: A brief explanation or expansion of the idea
+  - position: { x: 0, y: 0 } (This is just a placeholder)
+Do not include any additional text, markdown syntax, or code fences, and ensure the JSON is complete and properly formatted with no trailing commas.`;
 
     // Make API call to the selected provider
     const response = await this.callProvider(systemPrompt, userPrompt);
+    console.log("response", response);
+
     // Parse result and return ideas
     try {
       const aiIdeas = JSON.parse(response) as AIGeneratedIdeaResult[];
@@ -130,12 +134,13 @@ Each idea should be unique and innovative. Format your response as a JSON array 
     const systemPrompt = `You are a creative brainstorming assistant helping to expand on an existing idea. Generate ${depth > 1 ? "deep" : "related"} ideas that branch off from the main concept. Be specific and creative.`;
 
     const userPrompt = `Take this idea: "${idea}"
-    
+
 Generate ${3 * depth} new ideas that expand on this concept. Each new idea should introduce a variation, enhancement, or related concept.
-Format your response as a JSON array where each object has:
-- content: The expanded idea (short title)
-- description: A brief explanation of how this expands on the original idea
-- position: { x: 0, y: 0 } (This is just a placeholder)`;
+Respond with only valid JSON. Format the response as a JSON array of objects with the following properties:
+  - content: The expanded idea (short title)
+  - description: A brief explanation of how this expands on the original idea
+  - position: { x: 0, y: 0 } (This is just a placeholder)
+Ensure no additional text, markdown syntax, or code fences are included, and the JSON is complete and properly formatted.`;
 
     // Make API call to the selected provider
     const response = await this.callProvider(systemPrompt, userPrompt);
@@ -155,15 +160,7 @@ Format your response as a JSON array where each object has:
     } catch (error) {
       console.error("Error parsing AI response:", error);
       // Fallback in case parsing fails
-      return [
-        {
-          content:
-            "AI expansion failed. There was an error expanding this idea. Please try again.",
-          sessionId,
-          position: { x: 0, y: 0 },
-          isAiGenerated: true,
-        },
-      ];
+      return [];
     }
   }
 
@@ -178,12 +175,13 @@ Format your response as a JSON array where each object has:
     const systemPrompt = `You are a creative thinking assistant who can view ideas from different perspectives, like Edward de Bono's Six Thinking Hats. Consider analytical, emotional, critical, optimistic, creative, and process-oriented viewpoints.`;
 
     const userPrompt = `Consider this idea: "${idea}"
-    
+
 Generate ${count} alternative perspectives on this idea. Each perspective should offer a unique viewpoint or critique.
-Format your response as a JSON array where each object has:
-- content: A brief title for this perspective
-- description: An explanation of this perspective on the idea
-- position: { x: 0, y: 0 } (This is just a placeholder)`;
+Respond with only valid JSON. Format the response as a JSON array of objects with the following properties:
+  - content: A brief title for this perspective
+  - description: An explanation of this perspective on the idea
+  - position: { x: 0, y: 0 } (This is just a placeholder)
+Do not include any additional text, markdown syntax, or code fences, and ensure the JSON is complete and properly formatted.`;
 
     // Make API call to the selected provider
     const response = await this.callProvider(systemPrompt, userPrompt);
@@ -226,12 +224,13 @@ Format your response as a JSON array where each object has:
     const systemPrompt = `You are an expert at refining and improving ideas. Your goal is to take an existing idea and enhance it according to specific instructions.`;
 
     const userPrompt = `Here is an idea to refine: "${idea}"
-    
+
 Instructions for refinement: ${instructions}
 
-Provide a refined version of this idea. Format your response as a JSON object with:
-- content: The refined idea (short title)
-- description: An explanation of how you've refined the idea and why these changes improve it`;
+Provide a refined version of this idea. Respond with only valid JSON. Format the response as a JSON object with the following properties:
+  - content: The refined idea (short title)
+  - description: An explanation of how you've refined the idea and why these changes improve it
+Do not include any additional text, markdown syntax, or code fences, and ensure the JSON object is complete and properly formatted.`;
 
     // Make API call to the selected provider
     const response = await this.callProvider(systemPrompt, userPrompt);

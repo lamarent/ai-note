@@ -1,4 +1,5 @@
 import { apiConfig, ApiResponse } from "./config";
+import type { FetchOptions } from "./config";
 import { Idea } from "@ai-brainstorm/types";
 import { getApiKey, getProvider, getModel } from "../../utils/localStorage";
 
@@ -32,18 +33,22 @@ const getAuthHeaders = (): HeadersInit => {
  */
 export const aiApi = {
   /**
-   * Generate ideas based on a prompt
+   * Generate ideas based on a prompt, with optional custom timeout
    */
-  generateIdeas: (payload: {
-    sessionId: string;
-    prompt: string;
-    context?: string;
-    technique?: string;
-    count?: number;
-  }): Promise<ApiResponse<Idea[]>> => {
-    return apiConfig.post<Idea[]>(`${AI_ENDPOINT}/generate`, payload, {
-      headers: getAuthHeaders(),
-    });
+  generateIdeas: (
+    payload: {
+      sessionId: string;
+      prompt: string;
+      context?: string;
+      technique?: string;
+      count?: number;
+    },
+    // timeout in milliseconds (overrides default)
+    timeout = 50000
+  ): Promise<ApiResponse<Idea[]>> => {
+    // Build options with optional timeout
+    const options: FetchOptions = { headers: getAuthHeaders(), timeout };
+    return apiConfig.post<Idea[]>(`${AI_ENDPOINT}/generate`, payload, options);
   },
 
   /**

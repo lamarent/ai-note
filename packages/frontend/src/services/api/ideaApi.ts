@@ -1,4 +1,4 @@
-import { apiConfig /*, ApiResponse */ } from "./config";
+import { apiConfig } from "./config";
 import { Idea, CreateIdea, UpdateIdea } from "@ai-brainstorm/types";
 
 // API endpoints
@@ -12,42 +12,42 @@ export const ideaApi = {
    * Get all ideas
    */
   getAll: (sessionId: string) => {
-    return apiConfig.get<Idea[]>(`/api/sessions/${sessionId}/ideas`);
+    return apiConfig.get<Idea[]>(`${IDEAS_ENDPOINT}/session/${sessionId}`);
   },
 
   /**
    * Get an idea by ID
    */
   getById: (id: string) => {
-    return apiConfig.get<Idea>(`/api/ideas/${id}`);
+    return apiConfig.get<Idea>(`${IDEAS_ENDPOINT}/${id}`);
   },
 
   /**
    * Create a new idea
    */
   create: (data: CreateIdea) => {
-    return apiConfig.post<Idea>("/api/ideas", data);
+    return apiConfig.post<Idea>(`${IDEAS_ENDPOINT}`, data);
   },
 
   /**
    * Update an idea
    */
   update: (id: string, data: UpdateIdea) => {
-    return apiConfig.put<Idea>(`/api/ideas/${id}`, data);
+    return apiConfig.put<Idea>(`${IDEAS_ENDPOINT}/${id}`, data);
   },
 
   /**
    * Delete an idea
    */
   delete: (id: string) => {
-    return apiConfig.delete<void>(`/api/ideas/${id}`);
+    return apiConfig.delete<void>(`${IDEAS_ENDPOINT}/${id}`);
   },
 
   /**
    * Get ideas by session ID
    */
   getBySessionId: (sessionId: string) => {
-    return apiConfig.get<Idea[]>(`${IDEAS_ENDPOINT}?sessionId=${sessionId}`);
+    return apiConfig.get<Idea[]>(`${IDEAS_ENDPOINT}/session/${sessionId}`);
   },
 
   /**

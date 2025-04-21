@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useGenerateIdeas } from "../../hooks/useAI";
 import ApiKeyWarning from "../common/ApiKeyWarning";
 import { Idea } from "@ai-brainstorm/types";
+import IdeaCard from "../ideas/IdeaCard";
 
 interface AIGenerationPanelProps {
   sessionId: string;
@@ -154,6 +155,22 @@ const AIGenerationPanel: React.FC<AIGenerationPanelProps> = ({
               <span>Error: {generateIdeasMutation.error.message}</span>
             </div>
           </div>
+        )}
+
+        {generateIdeasMutation.data && (
+          <>
+            <h3 className="text-lg font-semibold mt-4">Generated Ideas</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              {generateIdeasMutation.data.map((idea) => (
+                <IdeaCard
+                  key={idea.id}
+                  idea={idea}
+                  onEdit={() => {}}
+                  onDelete={() => {}}
+                />
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>

@@ -100,6 +100,7 @@ export const isNetworkError = (error: unknown): boolean => {
 /**
  * API configuration and utility functions
  */
+export type FetchOptions = RequestInit & { timeout?: number };
 export const apiConfig = {
   baseUrl: API_BASE_URL,
 
@@ -108,17 +109,20 @@ export const apiConfig = {
    */
   async fetchApi<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: FetchOptions = {}
   ): Promise<ApiResponse<T>> {
+    // Allow custom timeout per call; fall back to DEFAULT_TIMEOUT
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT);
+    // extract timeout from options, remove it from fetch options
+    const { timeout = DEFAULT_TIMEOUT, ...fetchOptions } = options as any;
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     const url = `${this.baseUrl}${endpoint}`;
     const mergedOptions: RequestInit = {
-      ...options,
+      ...fetchOptions,
       headers: {
         ...DEFAULT_HEADERS,
-        ...options.headers,
+        ...fetchOptions.headers,
       },
       signal: controller.signal,
     };
@@ -203,7 +207,7 @@ export const apiConfig = {
 
   async get<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: FetchOptions = {}
   ): Promise<ApiResponse<T>> {
     return this.fetchApi<T>(endpoint, {
       method: "GET",
@@ -214,7 +218,7 @@ export const apiConfig = {
   async post<T>(
     endpoint: string,
     data: any,
-    options: RequestInit = {}
+    options: FetchOptions = {}
   ): Promise<ApiResponse<T>> {
     return this.fetchApi<T>(endpoint, {
       method: "POST",
@@ -226,7 +230,7 @@ export const apiConfig = {
   async put<T>(
     endpoint: string,
     data: any,
-    options: RequestInit = {}
+    options: FetchOptions = {}
   ): Promise<ApiResponse<T>> {
     return this.fetchApi<T>(endpoint, {
       method: "PUT",
@@ -238,7 +242,7 @@ export const apiConfig = {
   async patch<T>(
     endpoint: string,
     data: any,
-    options: RequestInit = {}
+    options: FetchOptions = {}
   ): Promise<ApiResponse<T>> {
     return this.fetchApi<T>(endpoint, {
       method: "PATCH",
@@ -249,7 +253,7 @@ export const apiConfig = {
 
   async delete<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: FetchOptions = {}
   ): Promise<ApiResponse<T>> {
     return this.fetchApi<T>(endpoint, {
       method: "DELETE",
