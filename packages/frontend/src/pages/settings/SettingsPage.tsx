@@ -49,6 +49,7 @@ const SettingsPage: React.FC = () => {
                 </label>
                 <select
                   value={activeEntryId || ""}
+                  onFocus={() => setEntries(getApiKeyEntries())}
                   onChange={(e) => {
                     saveActiveEntryId(e.target.value);
                     setActiveEntryId(e.target.value);
