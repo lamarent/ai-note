@@ -1,9 +1,9 @@
 -- DropIndex
--- DROP INDEX "sqlite_autoindex_prisma_migrations_1"; -- Skipped because index associated with PRIMARY KEY cannot be dropped in SQLite
+DROP INDEX IF EXISTS "sqlite_autoindex_prisma_migrations_1";
 
 -- DropTable
 PRAGMA foreign_keys=off;
-DROP TABLE "prisma_migrations";
+DROP TABLE IF EXISTS "prisma_migrations";
 PRAGMA foreign_keys=on;
 
 -- RedefineTables
