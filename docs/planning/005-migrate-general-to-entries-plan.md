@@ -32,6 +32,9 @@ The rest of the app still reads from the old single-key APIs. We need to migrate
   - In `SettingsPage` General tab:
     - Replace form with `<select>` sourcing `entries` + `activeEntryId` + saveActiveEntryId
     - Remove all inline API-key / provider / model inputs in general tab
+  - In feature pages (e.g., brainstorming, sessions, other AI-driven components):
+    - Add an optional dropdown or selector to override the default entry for that feature
+    - Default to using the active entry ID from Settings
   - Ensure the General tab now serves exclusively as a _picker_ of which entry is live
 
 - **Hooks & Fetchers**
