@@ -6,10 +6,12 @@ const STORAGE_KEYS = {
   PROVIDER: "ai-brainstorm-ai-provider",
   MODEL: "ai-brainstorm-ai-model",
   API_KEY_ENTRIES: "ai-brainstorm-api-key-entries",
+  ACTIVE_ENTRY_ID: "ai-brainstorm-active-entry-id",
 };
 
 /**
  * Save API key to local storage
+ * @deprecated Use ApiKeyEntry list and saveActiveEntryId instead
  * @param apiKey - The API key to save
  */
 export const saveApiKey = (apiKey: string): void => {
@@ -18,6 +20,7 @@ export const saveApiKey = (apiKey: string): void => {
 
 /**
  * Get API key from local storage
+ * @deprecated Use ApiKeyEntry list and getActiveEntryId instead
  * @returns The stored API key or null if not found
  */
 export const getApiKey = (): string | null => {
@@ -26,6 +29,7 @@ export const getApiKey = (): string | null => {
 
 /**
  * Remove API key from local storage
+ * @deprecated Legacy single-key API
  */
 export const removeApiKey = (): void => {
   localStorage.removeItem(STORAGE_KEYS.API_KEY);
@@ -33,6 +37,7 @@ export const removeApiKey = (): void => {
 
 /**
  * Save AI provider to local storage
+ * @deprecated Use ApiKeyEntry list and saveActiveEntryId instead
  * @param provider - The AI provider to save (e.g., "openai", "anthropic", "openrouter")
  */
 export const saveProvider = (provider: string): void => {
@@ -41,6 +46,7 @@ export const saveProvider = (provider: string): void => {
 
 /**
  * Get AI provider from local storage
+ * @deprecated Use ApiKeyEntry list and getActiveEntryId instead
  * @returns The stored AI provider or null if not found
  */
 export const getProvider = (): string | null => {
@@ -49,6 +55,7 @@ export const getProvider = (): string | null => {
 
 /**
  * Save AI model to local storage
+ * @deprecated Use ApiKeyEntry list and saveActiveEntryId instead
  * @param model - The AI model to save
  */
 export const saveModel = (model: string): void => {
@@ -57,10 +64,27 @@ export const saveModel = (model: string): void => {
 
 /**
  * Get AI model from local storage
+ * @deprecated Use ApiKeyEntry list and getActiveEntryId instead
  * @returns The stored AI model or null if not found
  */
 export const getModel = (): string | null => {
   return localStorage.getItem(STORAGE_KEYS.MODEL);
+};
+
+/**
+ * Get active API entry ID from local storage
+ * @returns The stored active entry ID or null if not found
+ */
+export const getActiveEntryId = (): string | null => {
+  return localStorage.getItem(STORAGE_KEYS.ACTIVE_ENTRY_ID);
+};
+
+/**
+ * Save active API entry ID to local storage
+ * @param id - The ID of the entry to set as active
+ */
+export const saveActiveEntryId = (id: string): void => {
+  localStorage.setItem(STORAGE_KEYS.ACTIVE_ENTRY_ID, id);
 };
 
 export const getApiKeyEntries = (): ApiKeyEntry[] => {
@@ -108,4 +132,6 @@ export default {
   addApiKeyEntry,
   removeApiKeyEntry,
   updateApiKeyEntry,
+  getActiveEntryId,
+  saveActiveEntryId,
 };
