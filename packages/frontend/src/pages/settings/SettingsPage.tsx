@@ -69,7 +69,7 @@ const SettingsPage: React.FC = () => {
     const fetchModels = async () => {
       setLoadingModels(true);
       setModelsError(null);
-      const key = getApiKey();
+      const key = apiKey || getApiKey();
       if (!key) {
         setModelsError("API key required to fetch models");
         setLoadingModels(false);
