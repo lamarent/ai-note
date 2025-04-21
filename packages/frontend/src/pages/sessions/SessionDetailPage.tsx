@@ -179,7 +179,7 @@ const SessionDetailPage: React.FC = () => {
   };
 
   // Handler for AI-generated ideas: invalidate ideas list to fetch newly saved ideas
-  const handleIdeasGenerated = (newIdeas: Idea[]) => {
+  const handleIdeasGenerated = () => {
     if (!sessionId) return;
     queryClient.invalidateQueries({
       queryKey: ["ideas", "list", { sessionId }] as const,

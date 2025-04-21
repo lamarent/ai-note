@@ -4,7 +4,6 @@ import AIGenerationPanel from "./AIGenerationPanel";
 import AIIdeaExpander from "./AIIdeaExpander";
 import AIAlternativePerspectives from "./AIAlternativePerspectives";
 import AIIdeaRefinement from "./AIIdeaRefinement";
-import { useApiKey } from "../../hooks/useApiKey";
 
 interface AIToolsPanelProps {
   sessionId: string;
@@ -22,7 +21,6 @@ const AIToolsPanel: React.FC<AIToolsPanelProps> = ({
   onIdeaRefined,
 }) => {
   const [activeTab, setActiveTab] = useState<TabType>("generate");
-  const { hasApiKey } = useApiKey();
 
   // Handle changing tabs
   const handleTabChange = (tab: TabType) => {

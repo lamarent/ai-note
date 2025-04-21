@@ -90,8 +90,8 @@ ai.post("/generate", async (c) => {
     );
 
     return c.json(savedIdeas, 201);
-  } catch (error: any) {
-    return c.json({ error: error.message }, 500);
+  } catch (error) {
+    return c.json({ error: (error as Error).message }, 500);
   }
 });
 
@@ -226,7 +226,7 @@ ai.post("/validate-key", (c) => {
     // Will throw if API key missing or invalid format
     getAIService(c);
     return c.json({ valid: true }, 200);
-  } catch (error) {
+  } catch {
     return c.json({ valid: false }, 401);
   }
 });

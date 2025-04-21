@@ -1,4 +1,4 @@
-import { Idea, CreateIdea } from "@ai-brainstorm/types";
+import { CreateIdea } from "@ai-brainstorm/types";
 
 interface AIServiceOptions {
   apiKey: string;
@@ -42,6 +42,21 @@ interface AIGeneratedIdeaResult {
   description: string;
   position?: { x: number; y: number };
   categoryId?: string;
+}
+
+// Add response types for providers
+interface AnthropicResponse {
+  completion: string;
+}
+
+interface OpenAIResponse {
+  choices: { message: { content: string } }[];
+}
+
+type ProviderResponse = AnthropicResponse | OpenAIResponse;
+
+interface ProviderError {
+  error?: { message?: string };
 }
 
 export class AIService {
@@ -108,7 +123,6 @@ Each idea should be unique and innovative. Format your response as a JSON array 
    * Expand an existing idea to generate related ideas
    */
   async expandIdea({
-    ideaId,
     sessionId,
     idea,
     depth = 1,
@@ -157,7 +171,6 @@ Format your response as a JSON array where each object has:
    * Generate alternative perspectives on an existing idea
    */
   async getAlternativePerspectives({
-    ideaId,
     sessionId,
     idea,
     count = 3,
@@ -206,7 +219,6 @@ Format your response as a JSON array where each object has:
    * Refine or improve an existing idea
    */
   async refineIdea({
-    ideaId,
     sessionId,
     idea,
     instructions,
@@ -316,18 +328,22 @@ Provide a refined version of this idea. Format your response as a JSON object wi
     });
 
     if (!response.ok) {
-      const errorData = (await response.json().catch(() => ({}))) as any;
+      const errorData = (await response
+        .json()
+        .catch(() => ({}) as ProviderError)) as ProviderError;
       throw new Error(
         `Provider API error: ${errorData.error?.message || response.statusText}`
       );
     }
 
-    const data = (await response.json()) as any;
-    // Extract raw response content from provider
-    const rawResponse =
-      this.provider === "anthropic"
-        ? data.completion
-        : data.choices[0].message.content;
+    const data = (await response.json()) as ProviderResponse;
+    // Extract raw response content from provider using type-safe guards
+    let rawResponse: string;
+    if (this.provider === "anthropic") {
+      rawResponse = (data as AnthropicResponse).completion;
+    } else {
+      rawResponse = (data as OpenAIResponse).choices[0].message.content;
+    }
     // Strip any markdown code fences from the response
     return this.stripCodeFences(rawResponse);
   }

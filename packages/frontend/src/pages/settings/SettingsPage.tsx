@@ -140,7 +140,7 @@ const SettingsPage: React.FC = () => {
 
     try {
       validateApiKeyMutation.mutate(apiKey);
-    } catch (err) {
+    } catch {
       setIsValidating(false);
       setValidationError(
         "An error occurred during validation. The key has been saved anyway."
@@ -178,16 +178,16 @@ const SettingsPage: React.FC = () => {
 
             {provider === "openrouter" && (
               <div className="text-sm text-gray-500 mt-1">
-                To get an OpenRouter API key, sign up at{" "}
+                Need an OpenRouter API key?{" "}
                 <a
-                  href="https://openrouter.ai/"
+                  href="https://openrouter.ai/settings/keys"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="link link-primary"
                 >
-                  openrouter.ai
-                </a>{" "}
-                and generate a key in your Dashboard.
+                  Go to the API keys page
+                </a>
+                .
               </div>
             )}
             <div className="form-control w-full">
