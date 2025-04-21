@@ -194,20 +194,6 @@ const SettingsPage: React.FC = () => {
                   </select>
                 </div>
 
-                {provider === "openrouter" && (
-                  <div className="text-sm text-gray-500 mt-1">
-                    Need an OpenRouter API key?{" "}
-                    <a
-                      href="https://openrouter.ai/settings/keys"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="link link-primary"
-                    >
-                      Go to the API keys page
-                    </a>
-                    .
-                  </div>
-                )}
                 <div className="form-control w-full">
                   <label className="label">
                     <span className="label-text">AI Service API Key</span>
