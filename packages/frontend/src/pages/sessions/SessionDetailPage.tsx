@@ -14,9 +14,9 @@ import {
   useUpdateSession,
   useDeleteSession,
   useGetIdeasBySession,
-  useCreateIdea,
   useUpdateIdea,
 } from "../../hooks";
+import { useQueryClient } from "@tanstack/react-query";
 import { Idea } from "@ai-brainstorm/types";
 import { format } from "date-fns";
 
@@ -109,6 +109,12 @@ const SessionDetailPage: React.FC = () => {
     "ideas"
   );
 
+  // Query client for refetching ideas list
+  const queryClient = useQueryClient();
+
+  // Update mutation for AI-refined ideas
+  const updateIdea = useUpdateIdea();
+
   // Update form data when session data is loaded
   useEffect(() => {
     if (session) {
@@ -133,10 +139,6 @@ const SessionDetailPage: React.FC = () => {
       navigate("/sessions");
     },
   });
-
-  // Create and update idea mutations for AI-generated content
-  const createIdea = useCreateIdea();
-  const updateIdea = useUpdateIdea();
 
   // Form handlers
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -176,19 +178,11 @@ const SessionDetailPage: React.FC = () => {
     }
   };
 
-  // Handler for AI-generated ideas
+  // Handler for AI-generated ideas: invalidate ideas list to fetch newly saved ideas
   const handleIdeasGenerated = (newIdeas: Idea[]) => {
     if (!sessionId) return;
-
-    // Create each idea in the database
-    newIdeas.forEach((idea) => {
-      createIdea.mutate({
-        sessionId,
-        content: idea.content,
-        position: idea.position || { x: 0, y: 0 },
-        isAiGenerated: true,
-        categoryId: idea.categoryId,
-      });
+    queryClient.invalidateQueries({
+      queryKey: ["ideas", "list", { sessionId }] as const,
     });
   };
 

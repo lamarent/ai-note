@@ -1,9 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { getApiKey, saveApiKey } from "../../utils/localStorage";
+import {
+  getApiKey,
+  saveApiKey,
+  getProvider,
+  saveProvider,
+  getModel,
+  saveModel,
+} from "../../utils/localStorage";
 import { useValidateApiKey } from "../../hooks/useAI";
+
+const AI_PROVIDERS = [
+  { id: "openai", name: "OpenAI" },
+  { id: "anthropic", name: "Anthropic" },
+  { id: "openrouter", name: "OpenRouter" },
+];
 
 const SettingsPage: React.FC = () => {
   const [apiKey, setApiKey] = useState<string>("");
+  const [provider, setProvider] = useState<string>(AI_PROVIDERS[0].id);
+  const [model, setModel] = useState<string>("");
+  const [modelsList, setModelsList] = useState<string[]>([]);
+  const [loadingModels, setLoadingModels] = useState(false);
+  const [modelsError, setModelsError] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -30,12 +48,72 @@ const SettingsPage: React.FC = () => {
     },
   });
 
+  // Load stored settings on mount
   useEffect(() => {
     const storedApiKey = getApiKey();
     if (storedApiKey) {
       setApiKey(storedApiKey);
     }
+    const storedProvider = getProvider();
+    if (storedProvider) {
+      setProvider(storedProvider);
+    }
+    const storedModel = getModel();
+    if (storedModel) {
+      setModel(storedModel);
+    }
   }, []);
+
+  // Fetch models whenever provider or API key changes
+  useEffect(() => {
+    const fetchModels = async () => {
+      setLoadingModels(true);
+      setModelsError(null);
+      const key = getApiKey();
+      if (!key) {
+        setModelsError("API key required to fetch models");
+        setLoadingModels(false);
+        return;
+      }
+      let url = "";
+      let headers: HeadersInit = {};
+      try {
+        switch (provider) {
+          case "openai":
+            url = "https://api.openai.com/v1/models";
+            headers = { Authorization: `Bearer ${key}` };
+            break;
+          case "anthropic":
+            url = "https://api.anthropic.com/v1/models";
+            headers = { "x-api-key": key };
+            break;
+          case "openrouter":
+            url = "https://openrouter.ai/api/v1/models";
+            headers = { Authorization: `Bearer ${key}` };
+            break;
+        }
+        const res = await fetch(url, { headers });
+        if (!res.ok) {
+          throw new Error(`Failed to fetch models: ${res.statusText}`);
+        }
+        const data = await res.json();
+        let models: string[] = [];
+        if (Array.isArray(data.data)) {
+          models = data.data.map((m: any) => m.id);
+        } else if (Array.isArray(data.models)) {
+          models = data.models.map((m: any) => m.id || m.name);
+        } else if (Array.isArray(data)) {
+          models = data.map((m: any) => m.id);
+        }
+        setModelsList(models);
+      } catch (err: any) {
+        setModelsError(err.message || "Error fetching models");
+      } finally {
+        setLoadingModels(false);
+      }
+    };
+    fetchModels();
+  }, [provider, apiKey]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,7 +123,7 @@ const SettingsPage: React.FC = () => {
       return;
     }
 
-    // Simple format validation (can be enhanced based on the actual API key format)
+    // Simple format validation
     if (apiKey.length < 10) {
       setValidationError(
         "API key appears to be too short. Please check your key."
@@ -53,10 +131,13 @@ const SettingsPage: React.FC = () => {
       return;
     }
 
+    // Save provider and model
+    saveProvider(provider);
+    if (model) saveModel(model);
+
     setIsValidating(true);
     setValidationError(null);
 
-    // Try to validate the API key
     try {
       validateApiKeyMutation.mutate(apiKey);
     } catch (err) {
@@ -64,18 +145,10 @@ const SettingsPage: React.FC = () => {
       setValidationError(
         "An error occurred during validation. The key has been saved anyway."
       );
-
-      // Save the key even if validation fails, since the validation endpoint might not be available in all environments
       saveApiKey(apiKey);
       setIsSaved(true);
       setTimeout(() => setIsSaved(false), 3000);
     }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setApiKey(e.target.value);
-    if (isSaved) setIsSaved(false);
-    if (validationError) setValidationError(null);
   };
 
   return (
@@ -85,8 +158,8 @@ const SettingsPage: React.FC = () => {
       <div className="card bg-base-200 shadow-lg">
         <div className="card-body">
           <h2 className="card-title">API Configuration</h2>
-          <form onSubmit={handleSubmit}>
-            <div className="form-control w-full mb-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="form-control w-full">
               <label className="label">
                 <span className="label-text">AI Service API Key</span>
               </label>
@@ -95,30 +168,72 @@ const SettingsPage: React.FC = () => {
                 placeholder="Enter your API key"
                 className={`input input-bordered w-full ${validationError ? "input-error" : ""}`}
                 value={apiKey}
-                onChange={handleChange}
+                onChange={(e) => setApiKey(e.target.value)}
               />
+            </div>
+
+            <div className="form-control w-full">
               <label className="label">
-                <span className="label-text-alt">
-                  Your API key is stored locally in your browser and never sent
-                  to our servers.
-                </span>
+                <span className="label-text">AI Provider</span>
               </label>
-              {validationError && (
-                <div className="text-error text-sm mt-1">{validationError}</div>
+              <select
+                value={provider}
+                onChange={(e) => setProvider(e.target.value)}
+                className="select select-bordered w-full"
+              >
+                {AI_PROVIDERS.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text">Model</span>
+              </label>
+              {loadingModels ? (
+                <div className="loading loading-dots"></div>
+              ) : (
+                <>
+                  <input
+                    list="modelOptions"
+                    value={model}
+                    onChange={(e) => setModel(e.target.value)}
+                    placeholder="Start typing model name..."
+                    className="input input-bordered w-full"
+                  />
+                  <datalist
+                    id="modelOptions"
+                    className="max-h-40 overflow-auto"
+                  >
+                    {modelsList.map((m) => (
+                      <option key={m} value={m} />
+                    ))}
+                  </datalist>
+                </>
+              )}
+              {modelsError && (
+                <div className="text-error text-sm mt-1">{modelsError}</div>
               )}
             </div>
 
-            <div className="flex items-center mt-4">
+            {validationError && (
+              <div className="text-error text-sm">{validationError}</div>
+            )}
+
+            <div className="flex items-center">
               <button
                 type="submit"
                 className={`btn btn-primary ${isValidating ? "loading" : ""}`}
                 disabled={!apiKey || isValidating}
               >
-                {isValidating ? "Validating..." : "Save API Key"}
+                {isValidating ? "Validating..." : "Save Settings"}
               </button>
               {isSaved && (
                 <span className="ml-4 text-success">
-                  API key saved successfully!
+                  Settings saved successfully!
                 </span>
               )}
             </div>

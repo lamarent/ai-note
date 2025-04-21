@@ -7,7 +7,7 @@ export const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8787"; // Use /api suffix from constants.ts
 
 // Default request timeout in milliseconds
-export const DEFAULT_TIMEOUT = 10000;
+export const DEFAULT_TIMEOUT = 20000;
 
 // Default headers for all requests
 export const DEFAULT_HEADERS: HeadersInit = {
@@ -60,10 +60,9 @@ export interface ApiResponse<T> {
  */
 export class ApiError extends Error {
   status: number;
-  data?: any;  
+  data?: any;
 
   constructor(message: string, status: number, data?: any) {
-     
     super(message);
     this.name = "ApiError";
     this.status = status;
@@ -128,7 +127,7 @@ export const apiConfig = {
       const response = await fetch(url, mergedOptions);
       clearTimeout(timeoutId);
 
-      let responseData: any = null;  
+      let responseData: any = null;
       const contentType = response.headers.get("content-type");
 
       // Try to parse JSON only if the content type indicates it
@@ -213,7 +212,7 @@ export const apiConfig = {
 
   async post<T>(
     endpoint: string,
-    data: any,  
+    data: any,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     return this.fetchApi<T>(endpoint, {
@@ -225,7 +224,7 @@ export const apiConfig = {
 
   async put<T>(
     endpoint: string,
-    data: any,  
+    data: any,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     return this.fetchApi<T>(endpoint, {
@@ -237,7 +236,7 @@ export const apiConfig = {
 
   async patch<T>(
     endpoint: string,
-    data: any,  
+    data: any,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     return this.fetchApi<T>(endpoint, {

@@ -54,7 +54,13 @@ app.use(
   cors({
     origin: "*", // Adjust this to your specific frontend domain in production
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowHeaders: ["Content-Type", "Authorization", "X-API-Key"],
+    allowHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-API-Key",
+      "X-AI-Provider",
+      "X-AI-Model",
+    ],
   })
 );
 

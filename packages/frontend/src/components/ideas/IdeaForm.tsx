@@ -47,14 +47,12 @@ const IdeaForm: React.FC<IdeaFormProps> = ({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="form-control">
-        <label htmlFor="content" className="label">
-          <span className="label-text">Idea Content</span>
-        </label>
+        <div className="label-text">Idea Content</div>
         <textarea
           id="content"
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          className={`textarea textarea-bordered ${error ? "textarea-error" : ""}`}
+          className={`textarea textarea-bordered w-full ${error ? "textarea-error" : ""}`}
           rows={3}
           placeholder="Enter your idea here..."
           required

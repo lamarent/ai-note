@@ -4,6 +4,7 @@ interface AIServiceOptions {
   apiKey: string;
   apiUrl: string;
   model?: string;
+  provider: string;
 }
 
 interface GenerateIdeasParams {
@@ -45,13 +46,13 @@ interface AIGeneratedIdeaResult {
 
 export class AIService {
   private apiKey: string;
-  private apiUrl: string;
   private model: string;
+  private provider: string;
 
   constructor(options: AIServiceOptions) {
     this.apiKey = options.apiKey;
-    this.apiUrl = options.apiUrl;
     this.model = options.model || "gpt-3.5-turbo";
+    this.provider = options.provider;
   }
 
   /**
@@ -75,12 +76,11 @@ Each idea should be unique and innovative. Format your response as a JSON array 
 - description: A brief explanation or expansion of the idea
 - position: { x: 0, y: 0 } (This is just a placeholder)`;
 
-    // Make API call to OpenAI
-    const completion = await this.callOpenAI(systemPrompt, userPrompt);
-
+    // Make API call to the selected provider
+    const response = await this.callProvider(systemPrompt, userPrompt);
     // Parse result and return ideas
     try {
-      const aiIdeas = JSON.parse(completion) as AIGeneratedIdeaResult[];
+      const aiIdeas = JSON.parse(response) as AIGeneratedIdeaResult[];
 
       // Convert AI-generated ideas to match the CreateIdea type
       return aiIdeas.map((idea) => ({
@@ -123,12 +123,12 @@ Format your response as a JSON array where each object has:
 - description: A brief explanation of how this expands on the original idea
 - position: { x: 0, y: 0 } (This is just a placeholder)`;
 
-    // Make API call to OpenAI
-    const completion = await this.callOpenAI(systemPrompt, userPrompt);
+    // Make API call to the selected provider
+    const response = await this.callProvider(systemPrompt, userPrompt);
 
     // Parse result and return ideas
     try {
-      const aiIdeas = JSON.parse(completion) as AIGeneratedIdeaResult[];
+      const aiIdeas = JSON.parse(response) as AIGeneratedIdeaResult[];
 
       // Convert AI-generated ideas to match the CreateIdea type
       return aiIdeas.map((idea) => ({
@@ -172,12 +172,12 @@ Format your response as a JSON array where each object has:
 - description: An explanation of this perspective on the idea
 - position: { x: 0, y: 0 } (This is just a placeholder)`;
 
-    // Make API call to OpenAI
-    const completion = await this.callOpenAI(systemPrompt, userPrompt);
+    // Make API call to the selected provider
+    const response = await this.callProvider(systemPrompt, userPrompt);
 
     // Parse result and return ideas
     try {
-      const aiIdeas = JSON.parse(completion) as AIGeneratedIdeaResult[];
+      const aiIdeas = JSON.parse(response) as AIGeneratedIdeaResult[];
 
       // Convert AI-generated ideas to match the CreateIdea type
       return aiIdeas.map((idea) => ({
@@ -221,12 +221,12 @@ Provide a refined version of this idea. Format your response as a JSON object wi
 - content: The refined idea (short title)
 - description: An explanation of how you've refined the idea and why these changes improve it`;
 
-    // Make API call to OpenAI
-    const completion = await this.callOpenAI(systemPrompt, userPrompt);
+    // Make API call to the selected provider
+    const response = await this.callProvider(systemPrompt, userPrompt);
 
     // Parse result and return refined idea
     try {
-      const refinedIdea = JSON.parse(completion) as AIGeneratedIdeaResult;
+      const refinedIdea = JSON.parse(response) as AIGeneratedIdeaResult;
 
       // Convert AI-generated idea to match the CreateIdea type
       return {
@@ -250,52 +250,98 @@ Provide a refined version of this idea. Format your response as a JSON object wi
   }
 
   /**
-   * Make API call to OpenAI
+   * Make API call to the selected provider
    */
-  private async callOpenAI(
+  private async callProvider(
     systemPrompt: string,
     userPrompt: string
   ): Promise<string> {
-    const url = `${this.apiUrl}/chat/completions`;
-
+    // Setup request for each provider
+    let url: string;
+    let headers: Record<string, string>;
+    let body: string;
+    switch (this.provider) {
+      case "anthropic":
+        url = `https://api.anthropic.com/v1/complete`;
+        headers = {
+          "Content-Type": "application/json",
+          "x-api-key": this.apiKey,
+        };
+        body = JSON.stringify({
+          model: this.model,
+          prompt: `\n\nHuman: ${systemPrompt}\n\nAssistant: ${userPrompt}`,
+          max_tokens_to_sample: 2000,
+          temperature: 0.8,
+          stop_sequences: ["\n\nHuman:"],
+        });
+        break;
+      case "openrouter":
+        url = `https://openrouter.ai/api/v1/chat/completions`;
+        headers = {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.apiKey}`,
+        };
+        body = JSON.stringify({
+          model: this.model,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+          temperature: 0.8,
+          max_tokens: 2000,
+        });
+        break;
+      case "openai":
+      default:
+        url = `https://api.openai.com/v1/chat/completions`;
+        headers = {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.apiKey}`,
+        };
+        body = JSON.stringify({
+          model: this.model,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+          temperature: 0.8,
+          max_tokens: 2000,
+        });
+        break;
+    }
     const response = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${this.apiKey}`,
-      },
-      body: JSON.stringify({
-        model: this.model,
-        messages: [
-          {
-            role: "system",
-            content: systemPrompt,
-          },
-          {
-            role: "user",
-            content: userPrompt,
-          },
-        ],
-        temperature: 0.8,
-        max_tokens: 2000,
-      }),
+      headers,
+      body,
     });
 
     if (!response.ok) {
-      const errorData = (await response.json()) as {
-        error?: { message?: string };
-      };
-      console.error("OpenAI API error:", errorData);
+      const errorData = (await response.json().catch(() => ({}))) as any;
       throw new Error(
-        `OpenAI API error: ${errorData.error?.message || "Unknown error"}`
+        `Provider API error: ${errorData.error?.message || response.statusText}`
       );
     }
 
-    const data = (await response.json()) as {
-      choices: Array<{ message: { content: string } }>;
-    };
+    const data = (await response.json()) as any;
+    // Extract raw response content from provider
+    const rawResponse =
+      this.provider === "anthropic"
+        ? data.completion
+        : data.choices[0].message.content;
+    // Strip any markdown code fences from the response
+    return this.stripCodeFences(rawResponse);
+  }
 
-    return data.choices[0].message.content;
+  // Helper to strip markdown code fences from AI responses
+  private stripCodeFences(text: string): string {
+    let trimmed = text.trim();
+    if (trimmed.startsWith("```")) {
+      // Remove leading code fence with optional language
+      trimmed = trimmed.replace(/^```[^\n]*\n/, "");
+      // Remove trailing code fence
+      trimmed = trimmed.replace(/\n```$/, "");
+    }
+    return trimmed.trim();
   }
 
   /**

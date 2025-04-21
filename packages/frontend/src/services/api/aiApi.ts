@@ -1,21 +1,30 @@
 import { apiConfig, ApiResponse } from "./config";
 import { Idea } from "@ai-brainstorm/types";
-import { getApiKey } from "../../utils/localStorage";
+import { getApiKey, getProvider, getModel } from "../../utils/localStorage";
 
 // AI API endpoint
 const AI_ENDPOINT = "/api/ai";
 
 /**
- * Helper to create headers with API key
+ * Helper to create headers with API key and AI settings
  */
 const getAuthHeaders = (): HeadersInit => {
   const apiKey = getApiKey();
   if (!apiKey) {
     throw new Error("API key is required. Please set it in the settings page.");
   }
-  return {
+  const headers: Record<string, string> = {
     "X-API-Key": apiKey,
   };
+  const provider = getProvider();
+  if (provider) {
+    headers["X-AI-Provider"] = provider;
+  }
+  const model = getModel();
+  if (model) {
+    headers["X-AI-Model"] = model;
+  }
+  return headers;
 };
 
 /**

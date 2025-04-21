@@ -1,11 +1,3 @@
--- DropIndex
-DROP INDEX IF EXISTS "sqlite_autoindex_prisma_migrations_1";
-
--- DropTable
-PRAGMA foreign_keys=off;
-DROP TABLE IF EXISTS "prisma_migrations";
-PRAGMA foreign_keys=on;
-
 -- RedefineTables
 PRAGMA defer_foreign_keys=ON;
 PRAGMA foreign_keys=OFF;

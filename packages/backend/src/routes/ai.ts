@@ -10,6 +10,7 @@ type Bindings = {
   AI_API_KEY: string;
   AI_API_URL: string;
   AI_MODEL?: string;
+  AI_PROVIDER?: string;
 };
 
 // Define a type that matches exactly what IdeaRepository.create expects
@@ -23,9 +24,9 @@ interface DatabaseIdea {
 
 const ai = new Hono<{ Bindings: Bindings }>();
 
-// Helper to create AI service instance
+// Helper to create AI service instance with provider and model
 const getAIService = (c: Context<{ Bindings: Bindings }>): AIService => {
-  // Attempt to read the API key from the request header
+  // Read API key
   const headerKey = c.req.header("X-API-Key") || c.req.header("x-api-key");
   const apiKey = headerKey ?? c.env.AI_API_KEY;
   if (!apiKey) {
@@ -33,10 +34,18 @@ const getAIService = (c: Context<{ Bindings: Bindings }>): AIService => {
       "API key is required (provide via X-API-Key header or env AI_API_KEY)"
     );
   }
+  // Read AI provider
+  const headerProvider =
+    c.req.header("X-AI-Provider") || c.req.header("x-ai-provider");
+  const provider = headerProvider || c.env.AI_PROVIDER || "openai";
+  // Read AI model
+  const headerModel = c.req.header("X-AI-Model") || c.req.header("x-ai-model");
+  const model = headerModel || c.env.AI_MODEL;
   return new AIService({
     apiKey,
     apiUrl: c.env.AI_API_URL,
-    model: c.env.AI_MODEL,
+    provider,
+    model,
   });
 };
 
