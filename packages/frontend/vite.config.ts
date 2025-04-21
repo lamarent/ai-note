@@ -9,7 +9,7 @@ export default defineConfig({
     proxy: {
       // Proxy API requests to the backend dev server
       "/api": {
-        target: "http://localhost:8787", // Default wrangler dev port
+        target: process.env.VITE_API_BASE_URL || "http://localhost:8787",
         changeOrigin: true,
         secure: false,
         // Optional: rewrite path if needed, e.g., remove /api prefix

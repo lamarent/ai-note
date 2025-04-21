@@ -1,57 +1,28 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 // import Layout from "../../components/layout/Layout"; // Layout wraps at App level
 // import Header from "../../components/layout/Header"; // Removed unused Header
 import Button from "../../components/common/Button";
 import Card from "../../components/common/Card";
+import { useGetSessions } from "../../hooks/useSessions";
+import LoadingFallback from "../../components/common/LoadingFallback";
 
-// Mock data for recent sessions - replace with actual API calls later
-const mockRecentSessions = [
-  {
-    id: "1",
-    title: "Product Roadmap 2023",
-    updatedAt: "2023-08-15",
-    ideaCount: 12,
-  },
-  {
-    id: "2",
-    title: "Marketing Campaign Brainstorm",
-    updatedAt: "2023-08-10",
-    ideaCount: 8,
-  },
-  {
-    id: "3",
-    title: "App Feature Ideas",
-    updatedAt: "2023-08-05",
-    ideaCount: 15,
-  },
-];
+// Removed mock data; using live API
 
 const HomePage: React.FC = () => {
-  const [recentSessions /* setRecentSessions */] = useState(mockRecentSessions); // Removed unused setRecentSessions
-  const [
-    ,/* isLoading */
-    /* setIsLoading */
-  ] = useState(false); // Removed unused isLoading and setIsLoading
+  const { data: sessions = [], isLoading, isError, error } = useGetSessions();
+  const recentSessions = React.useMemo(
+    () =>
+      [...sessions]
+        .sort(
+          (a, b) =>
+            new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        )
+        .slice(0, 3),
+    [sessions]
+  );
 
-  // Here you would fetch actual sessions from API
-  useEffect(() => {
-    // Future implementation:
-    // const fetchRecentSessions = async () => {
-    //   setIsLoading(true); // Keep this if needed for future fetch logic
-    //   try {
-    //     const response = await fetch('/api/v1/sessions?limit=3&sort=updatedAt');
-    //     const data = await response.json();
-    //     setRecentSessions(data.sessions); // Keep this if needed for future fetch logic
-    //   } catch (error) {
-    //     console.error('Failed to fetch recent sessions:', error);
-    //   } finally {
-    //     setIsLoading(false); // Keep this if needed for future fetch logic
-    //   }
-    // };
-    //
-    // fetchRecentSessions();
-  }, []);
+  // Use React Query to fetch sessions
 
   return (
     <>
@@ -69,7 +40,7 @@ const HomePage: React.FC = () => {
               thinking with AI
             </p>
             <div className="flex justify-center gap-4">
-              <Link to="/sessions/new">
+              <Link to="/sessions">
                 <Button size="lg" variant="primary">
                   Create New Session
                 </Button>
@@ -115,8 +86,17 @@ const HomePage: React.FC = () => {
               </Link>
             </div>
 
-            {/* Change condition to check recentSessions directly */}
-            {recentSessions.length > 0 ? (
+            {isLoading ? (
+              <LoadingFallback />
+            ) : isError ? (
+              <Card className="bg-red-50 border border-red-200 mb-6">
+                <div className="text-red-600">
+                  <p>
+                    Error loading sessions: {error?.message || "Unknown error"}
+                  </p>
+                </div>
+              </Card>
+            ) : recentSessions.length > 0 ? (
               <div className="grid md:grid-cols-3 gap-6">
                 {recentSessions.map((session) => (
                   <Card
@@ -130,9 +110,6 @@ const HomePage: React.FC = () => {
                       Last updated:{" "}
                       {new Date(session.updatedAt).toLocaleDateString()}
                     </div>
-                    <div className="text-sm  mb-4">
-                      {session.ideaCount} ideas
-                    </div>
                     <Link to={`/sessions/${session.id}`}>
                       <Button fullWidth variant="secondary">
                         Open Session
@@ -144,7 +121,7 @@ const HomePage: React.FC = () => {
             ) : (
               <Card className="text-center p-8">
                 <p className=" mb-4">You don't have any sessions yet.</p>
-                <Link to="/sessions/new">
+                <Link to="/sessions">
                   <Button>Create Your First Session</Button>
                 </Link>
               </Card>
@@ -161,7 +138,7 @@ const HomePage: React.FC = () => {
               AI-assisted ideation today!
             </p>
             <div className="flex justify-center">
-              <Link to="/sessions/new">
+              <Link to="/sessions">
                 <Button size="lg">Get Started Now</Button>
               </Link>
             </div>
