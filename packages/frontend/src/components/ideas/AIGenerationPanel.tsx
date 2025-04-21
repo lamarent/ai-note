@@ -60,6 +60,7 @@ const AIGenerationPanel: React.FC<AIGenerationPanelProps> = ({
         sessionId,
         ideaId: selectedIdea.id,
         depth: 1,
+        idea: selectedIdea.content,
       });
     }
   };
