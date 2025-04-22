@@ -27,12 +27,17 @@ When first engaging with the project or starting a new major task:
     - **Action:** Review `docs/Product-Specification.md`.
     - **Goal:** Understand the application's purpose, target features (especially MVP), and overall goals.
 
-5.  **Understand High-Level Architecture:**
+5.  **Review Planning Documents:**
+
+    - **Action:** Read `docs/planning/README.md`.
+    - **Goal:** Identify the relevant initiative plan for the current task and understand its scope.
+
+6.  **Understand High-Level Architecture:**
 
     - **Action:** Review `docs/Architecture.md`.
     - **Goal:** Understand the major components of the system (frontend, backend, database, AI service) and how they interact.
 
-6.  **Understand Technical Setup:**
+7.  **Understand Technical Setup:**
     - **Action:** Review `docs/Development-Guide.md`.
     - **Goal:** Understand the technology stack, project structure, environment setup, and common development commands.
 
@@ -43,7 +48,7 @@ Once onboarded, follow this general workflow for development tasks:
 1.  **Clarify Task:** Ensure the request is clear. If ambiguous, ask clarifying questions.
 2.  **Refresh Context:** Briefly re-check the latest entry in `docs/context/00_development-log.md` and any relevant files in `docs/context/state/` to ensure no critical updates occurred since onboarding.
 3.  **Consult Knowledge Base & Guides (As Needed):**
-    - If the task involves specific areas like database migrations, frontend patterns, or API design, consult relevant files in `docs/context/knowledge-base/` or `docs/guides/`.
+    - If the task involves specific areas like database migrations, frontend patterns, or API design, consult relevant files in `docs/context/knowledge-base/`, `docs/guides/`, or the planning index (`docs/planning/README.md`).
     - Refer to `docs/API-Design.md` or `docs/UI-Design.md` if relevant to the task (but prioritize code/log context if documentation seems potentially outdated).
 4.  **Plan & Execute:** Formulate a plan (if necessary) and implement the required code changes, adhering to project conventions (linting, formatting, etc.).
 5.  **Test:** Ensure changes work as expected (manual testing, running automated tests if applicable).

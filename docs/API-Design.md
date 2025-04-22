@@ -53,6 +53,24 @@ interface AIPrompt {
 }
 ```
 
+### ApiKeyEntry
+
+```typescript
+interface ApiKeyEntry {
+  id: string;
+  provider: string;
+  model: string;
+  key: string;
+  createdAt: string; // ISO date string
+}
+```
+
+### Local Storage Schema
+
+- `ai-brainstorm-api-key-entries`: A JSON-serialized array of `ApiKeyEntry` objects.
+- `ai-brainstorm-active-entry-id`: The `id` of the currently active `ApiKeyEntry`.
+- UI components listen for `apiKeyEntriesChanged` and `activeEntryIdChanged` events to stay in sync.
+
 ## API Endpoints
 
 ### Sessions

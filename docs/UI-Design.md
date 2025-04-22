@@ -132,6 +132,17 @@ The application will use a modern, clean color palette:
 - **Export Panel**: Options for exporting session data
 - **Category Manager**: Interface for managing idea categories and tags
 
+### Settings Page
+
+- The Settings page will have two tabs:
+  - **General Settings**: Allows selection of a default API key from a dropdown of configured API Key Entries.
+  - **API Keys**: Allows management of multiple API keys, including:
+    - Listing existing entries with provider, model, masked key, created timestamp.
+    - Adding a new entry by selecting provider, entering API key, and selecting model via dynamic fetch.
+    - Editing and deleting entries.
+- The General Settings tab's dropdown updates the active API entry ID in localStorage under `ai-brainstorm-active-entry-id`.
+- UI events `apiKeyEntriesChanged` and `activeEntryIdChanged` trigger updates to UI components when entries or active entry change.
+
 ## Interactive Patterns
 
 ### Drag and Drop

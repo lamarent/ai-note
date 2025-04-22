@@ -23,6 +23,7 @@ import {
   getApiKeyEntries,
   getActiveEntryId,
   saveActiveEntryId,
+  removeActiveEntryId,
 } from "../../utils/localStorage";
 import type { ApiKeyEntry } from "../../types/apiKey";
 
@@ -110,8 +111,18 @@ const SessionDetailPage: React.FC = () => {
 
   // Load API key entries and current override on mount
   useEffect(() => {
-    setEntries(getApiKeyEntries());
-    setOverrideEntryId(getActiveEntryId());
+    const updateEntries = () => setEntries(getApiKeyEntries());
+    const updateOverrideEntryId = () => setOverrideEntryId(getActiveEntryId());
+    // Initial load
+    updateEntries();
+    updateOverrideEntryId();
+    // Listen for storage change events
+    window.addEventListener("apiKeyEntriesChanged", updateEntries);
+    window.addEventListener("activeEntryIdChanged", updateOverrideEntryId);
+    return () => {
+      window.removeEventListener("apiKeyEntriesChanged", updateEntries);
+      window.removeEventListener("activeEntryIdChanged", updateOverrideEntryId);
+    };
   }, []);
 
   // Fetch ideas for this session (to provide for AI expansion and selection)
@@ -325,8 +336,12 @@ const SessionDetailPage: React.FC = () => {
                   onFocus={() => setEntries(getApiKeyEntries())}
                   onChange={(e) => {
                     const newId = e.target.value;
-                    saveActiveEntryId(newId);
-                    setOverrideEntryId(newId);
+                    if (newId) {
+                      saveActiveEntryId(newId);
+                    } else {
+                      removeActiveEntryId();
+                    }
+                    setOverrideEntryId(newId || null);
                   }}
                   className="select select-bordered w-full"
                 >

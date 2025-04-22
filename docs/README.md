@@ -30,9 +30,30 @@ See the [Development Guide](./Development-Guide.md) for setup instructions.
 
 ## Documentation
 
+### Core Documentation
+
 - [Product Specification](./Product-Specification.md)
 - [Architecture](./Architecture.md)
 - [API Design](./API-Design.md)
 - [UI Design](./UI-Design.md)
 - [Development Guide](./Development-Guide.md)
+
+### AI Assistant
+
 - [AI Assistant Workflow Guide](./AI-Assistant-Workflow.md)
+
+### Context
+
+- [Context Tracking Overview](./context/README.md)
+
+### Planning
+
+- [Planning Documents](./planning/)
+
+### Guides
+
+- [Guides](./guides/)
+
+### Architectural Decisions
+
+- [ADR Documents](./ADR/)

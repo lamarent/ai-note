@@ -9,7 +9,7 @@ Restructure, update, and clean redundant files in the `docs` and `docs/context` 
 - `docs/README.md`: Standard project overview.
 - `docs/context/README.md`: Describes an intended structure not fully implemented.
 - `docs/Development-Guide.md`: Standard setup guide.
-- `docs/context/development-log.md`: Main chronological log, currently verbose.
+- `docs/context/00_development-log.md`: Main chronological log, currently verbose.
 - Other `docs/context/*.md` files: Specific notes likely related to log entries.
 - Redundancy: `MVP-Plan.md` vs. `Features.md`. Potential staleness in `API-Design.md`, `UI-Design.md`.
 
@@ -42,7 +42,6 @@ docs/
     │   └── blockers.md       # (To be created/maintained)
     ├── references/
     │   └── ... (add as needed)
-    └── archive/              # (Contents to be checked)
 ```
 
 ## Action Plan
@@ -69,4 +68,3 @@ docs/
 5.  **Update Content:**
     - Update links in `docs/README.md`.
     - Update `docs/context/README.md` to reflect the new structure and usage guidelines.
-6.  **Review `docs/context/archive/`:** List contents and decide on cleanup action.

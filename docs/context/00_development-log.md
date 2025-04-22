@@ -1,6 +1,33 @@
 # Development Log
 
-This file tracks the development activities of the AI Brainstorm app in reverse chronological order (newest entries at the top).
+## 2025-06-11: Documentation & Planning Cleanup
+
+- Removed redundant state files and moved CI/CD plan to `docs/planning/006-ci-cd-setup-plan.md`.
+- Updated root and project docs READMEs with accurate project structure and organized documentation sections.
+- Created planning index at `docs/planning/README.md` listing all planning documents.
+- Updated `docs/context/references/key-files.md` to include a Planning Documents section.
+- Removed references to outdated files and cleaned up mentions of obsolete archives.
+- Next steps: refine planning index, enhance key-files entries, and update `next-steps.md` accordingly.
+
+## 2025-06-10: API Key Management Enhancement
+
+- Implemented multiple API key management UI in Settings:
+  - Added `ApiKeysTab.tsx` for listing, adding, editing, deleting entries.
+  - Added tab navigation in `SettingsPage.tsx` with "General Settings" and "API Keys" tabs.
+  - Updated `SettingsPage.tsx` to listen for `apiKeyEntriesChanged` and `activeEntryIdChanged` events.
+  - Handled empty selection to remove the active entry ID.
+- Extended local storage utilities in `localStorage.ts`:
+  - Added `getApiKeyEntries`, `saveApiKeyEntries`, `addApiKeyEntry`, `removeApiKeyEntry`, `updateApiKeyEntry` functions.
+  - Introduced `getActiveEntryId`, `saveActiveEntryId`, `removeActiveEntryId` with event dispatching.
+- Updated API integration and hooks:
+  - `useApiKey` now subscribes to storage change events.
+  - `SessionDetailPage.tsx` supports API key override via dropdown with storage event listeners.
+- Updated documentation:
+  - Added `ApiKeyEntry` type and Local Storage schema to `API-Design.md`.
+  - Added Settings Page section to `UI-Design.md`.
+- Next steps:
+  - Write unit tests for storage utility functions.
+  - Refactor AI fetch utilities to handle missing entries gracefully.
 
 ## 2025-05-01: AI Service Implementation
 

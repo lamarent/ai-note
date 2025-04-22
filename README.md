@@ -70,24 +70,46 @@ This project follows a monorepo structure using PNPM workspaces:
 ```
 /
 |-- packages/
-|   |-- web/             # React Frontend
-|   `-- worker/          # Cloudflare Worker Backend
-|-- packages/
+|   |-- frontend/        # React Frontend
+|   |-- backend/         # Cloudflare Worker Backend
+|   |-- database/        # Database setup and migrations
 |   |-- ui/              # Shared UI components
 |   |-- types/           # Shared TypeScript types
 |   `-- config/          # Shared configurations
-|-- docs/                # Project documentation
-`-- scripts/             # Utility scripts
+|-- docs/               # Project documentation
+`-- scripts/            # Utility scripts
 ```
 
 ## Documentation
 
-- [MVP Plan](docs/MVP-Plan.md)
+### Core Documentation
+
+- [Product Specification](docs/Product-Specification.md)
 - [Architecture](docs/Architecture.md)
-- [Features](docs/Features.md)
 - [API Design](docs/API-Design.md)
 - [UI Design](docs/UI-Design.md)
 - [Development Guide](docs/Development-Guide.md)
+
+### AI Assistant
+
+- [AI Assistant Workflow Guide](docs/AI-Assistant-Workflow.md)
+
+### Context
+
+- [Context Tracking Overview](docs/context/README.md)
+- [Development Log](docs/context/00_development-log.md)
+
+### Planning
+
+- [Planning Documents](docs/planning/)
+
+### Guides
+
+- [Guides](docs/guides/)
+
+### Architectural Decisions
+
+- [ADR Documents](docs/ADR/)
 
 ## Contributing
 

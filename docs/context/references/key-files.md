@@ -51,21 +51,25 @@ This document lists the most important files in the AI Brainstorm project with b
 | File                                      | Description                      |
 | ----------------------------------------- | -------------------------------- |
 | `docs/README.md`                          | Main project documentation       |
-| `docs/MVP-Plan.md`                        | MVP development plan             |
+| `docs/Product-Specification.md`           | Product specification & features |
 | `docs/Architecture.md`                    | System architecture overview     |
-| `docs/Features.md`                        | Feature specifications           |
 | `docs/API-Design.md`                      | API endpoint documentation       |
 | `docs/UI-Design.md`                       | UI design guidelines             |
 | `docs/Development-Guide.md`               | Development setup instructions   |
 | `docs/ADR/001-tech-stack-selection.md`    | ADR for technology stack choices |
 | `docs/ADR/002-database-schema-design.md`  | ADR for database schema design   |
 | `docs/ADR/003-ai-integration-approach.md` | ADR for AI integration approach  |
+| `docs/planning/README.md`                 | Planning documents index         |
+| `docs/guides/README.md`                   | Guides index                     |
 
 ## Context Tracking
 
 | File                                           | Description                            |
 | ---------------------------------------------- | -------------------------------------- |
-| `docs/context/development-log.md`              | Chronological development activity log |
+| `docs/context/00_development-log.md`           | Chronological development activity log |
+| `docs/context/ai-brainstorm-implementation.md` | AI brainstorm implementation context   |
+| `docs/context/plan-idea-management.md`         | Idea management planning context       |
+| `docs/context/refactor-header-layout.md`       | Header refactoring context             |
 | `docs/context/state/current-focus.md`          | Current development focus              |
 | `docs/context/state/blockers.md`               | Current blockers and challenges        |
 | `docs/context/state/next-steps.md`             | Planned next steps                     |

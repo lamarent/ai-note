@@ -17,8 +17,18 @@ const SettingsPage: React.FC = () => {
 
   // Load entries and active entry ID on mount
   useEffect(() => {
-    setEntries(getApiKeyEntries());
-    setActiveEntryId(getActiveEntryId());
+    const updateEntries = () => setEntries(getApiKeyEntries());
+    const updateActiveEntryId = () => setActiveEntryId(getActiveEntryId());
+    // Initial load
+    updateEntries();
+    updateActiveEntryId();
+    // Listen for storage change events
+    window.addEventListener("apiKeyEntriesChanged", updateEntries);
+    window.addEventListener("activeEntryIdChanged", updateActiveEntryId);
+    return () => {
+      window.removeEventListener("apiKeyEntriesChanged", updateEntries);
+      window.removeEventListener("activeEntryIdChanged", updateActiveEntryId);
+    };
   }, []);
 
   return (
@@ -62,8 +72,13 @@ const SettingsPage: React.FC = () => {
                     }
                   }}
                   onChange={(e) => {
-                    saveActiveEntryId(e.target.value);
-                    setActiveEntryId(e.target.value);
+                    const newId = e.target.value;
+                    if (newId) {
+                      saveActiveEntryId(newId);
+                    } else {
+                      removeActiveEntryId();
+                    }
+                    setActiveEntryId(newId || null);
                   }}
                   className="select select-bordered w-full"
                 >

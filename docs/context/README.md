@@ -14,20 +14,22 @@ This directory contains files and documentation to support AI-assisted developme
 
 ```
 docs/context/
-├── README.md                 # This file: Overview of the context system
-├── 00_development-log.md     # PRIMARY: Chronological log of development activities (newest first)
-├── knowledge-base/           # Specific, persistent knowledge related to the project
-│   ├── database-notes.md     # Notes on DB setup, migrations, Wrangler config
-│   ├── frontend-notes.md     # Notes on specific frontend integration points or patterns
-│   └── ...                   # Add other focused knowledge files as needed
-├── state/                    # Current snapshot of the development state
-│   ├── current-focus.md      # What's actively being worked on (optional, keep updated)
-│   ├── blockers.md           # Current blockers and challenges (optional, keep updated)
-│   └── next-steps.md         # Near-term planned next steps (optional, keep updated)
-├── references/               # Useful reference points (optional)
-│   ├── key-files.md          # List of critical files with descriptions
-│   └── external-resources.md # Links to relevant external docs, articles, etc.
-└── archive/                  # Older context files (if needed, periodically review)
+├── README.md                         # This file: Overview of the context system
+├── 00_development-log.md             # PRIMARY: Chronological log of development activities (newest first)
+├── ai-brainstorm-implementation.md   # Context note on AI Brainstorm implementation
+├── plan-idea-management.md           # Context note on idea management planning
+├── refactor-header-layout.md         # Context note on header refactoring
+├── knowledge-base/                   # Specific, persistent knowledge related to the project
+│   ├── database-notes.md             # Notes on DB setup, migrations, seeding, integration with the backend
+│   ├── frontend-notes.md             # Notes on specific frontend integration points or patterns
+│   └── ...                           # Add other focused knowledge files as needed
+├── state/                            # Current snapshot of the development state
+│   ├── current-focus.md              # What's actively being worked on (optional, keep updated)
+│   ├── blockers.md                   # Current blockers and challenges (optional, keep updated)
+│   └── next-steps.md                 # Near-term planned next steps (optional, keep updated)
+├── references/                       # Useful reference points (optional)
+│   ├── key-files.md                  # List of critical files with descriptions
+│   └── external-resources.md         # Links to relevant external docs, articles, etc.
 ```
 
 ## How to Use
