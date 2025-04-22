@@ -1,5 +1,11 @@
 # Development Log
 
+## 2025-06-12: Add \_redirects file for Cloudflare Pages
+
+- Created `_redirects` file in `packages/frontend/public` to enable SPA routing fallback on Cloudflare Pages.
+- Added rule `/* /index.html 200` for routing fallback.
+- Next steps: run `pnpm build` and deploy to Cloudflare Pages to verify fallback routing works.
+
 ## 2025-06-11: Documentation & Planning Cleanup
 
 - Removed redundant state files and moved CI/CD plan to `docs/planning/006-ci-cd-setup-plan.md`.
