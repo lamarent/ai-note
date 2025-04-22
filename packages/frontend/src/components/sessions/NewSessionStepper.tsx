@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Input from "../forms/Input";
 import Button from "../common/Button";
-import Card from "../common/Card";
 import { useGenerateIdeas, useCreateSession, useCreateIdea } from "../../hooks";
 import { Idea } from "@ai-brainstorm/types";
 import { useNavigate } from "react-router-dom";
@@ -30,7 +29,7 @@ const NewSessionStepper: React.FC = () => {
     if (step === 2 && sessionId) {
       generateIdeas.mutate({ sessionId, prompt: topic, count: 5 });
     }
-  }, [step, sessionId]);
+  }, [step, sessionId, topic, generateIdeas]);
 
   // Create session on first step completion
   const handleNextFromTopic = async () => {

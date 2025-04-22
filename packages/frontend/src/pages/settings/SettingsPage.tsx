@@ -8,8 +8,6 @@ import {
 import type { ApiKeyEntry } from "../../types/apiKey";
 import ApiKeysTab from "./ApiKeysTab";
 
-const AI_PROVIDERS = []; // no longer used in this component
-
 const SettingsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"general" | "apikeys">("general");
   const [entries, setEntries] = useState<ApiKeyEntry[]>([]);
