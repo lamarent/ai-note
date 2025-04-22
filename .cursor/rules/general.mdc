@@ -3,7 +3,7 @@ description:
 globs: 
 alwaysApply: true
 ---
-always say "General rule applied" at begin response
+always say "General rule applied" at begin response on chat
 always read docs folder, context files, relate docs carefully before take actions
 
 ai-assisted development first
