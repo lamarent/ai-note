@@ -19,6 +19,12 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { Idea } from "@ai-brainstorm/types";
 import { format } from "date-fns";
+import {
+  getApiKeyEntries,
+  getActiveEntryId,
+  saveActiveEntryId,
+} from "../../utils/localStorage";
+import type { ApiKeyEntry } from "../../types/apiKey";
 
 // Extracted SessionHeader component to simplify header rendering
 interface SessionHeaderProps {
@@ -90,6 +96,9 @@ const SessionDetailPage: React.FC = () => {
     isPublic: true,
   });
   const [selectedIdea, setSelectedIdea] = useState<Idea | undefined>(undefined);
+  // API key override state
+  const [entries, setEntries] = useState<ApiKeyEntry[]>([]);
+  const [overrideEntryId, setOverrideEntryId] = useState<string | null>(null);
 
   // Fetch session details
   const {
@@ -98,6 +107,12 @@ const SessionDetailPage: React.FC = () => {
     error: sessionError,
     isError: isSessionError,
   } = useGetSessionById(sessionId || "");
+
+  // Load API key entries and current override on mount
+  useEffect(() => {
+    setEntries(getApiKeyEntries());
+    setOverrideEntryId(getActiveEntryId());
+  }, []);
 
   // Fetch ideas for this session (to provide for AI expansion and selection)
   const { data: ideas = [], isLoading: isIdeasLoading } = useGetIdeasBySession(
@@ -300,6 +315,30 @@ const SessionDetailPage: React.FC = () => {
 
           {activeTab === "ai" && (
             <div id="ai-panel" role="tabpanel" className="mb-6">
+              {/* API Key Override Dropdown */}
+              <div className="form-control mb-4">
+                <label className="label">
+                  <span className="label-text">API Key Override</span>
+                </label>
+                <select
+                  value={overrideEntryId || ""}
+                  onFocus={() => setEntries(getApiKeyEntries())}
+                  onChange={(e) => {
+                    const newId = e.target.value;
+                    saveActiveEntryId(newId);
+                    setOverrideEntryId(newId);
+                  }}
+                  className="select select-bordered w-full"
+                >
+                  <option value="">Use Default</option>
+                  {entries.map((entry) => (
+                    <option key={entry.id} value={entry.id}>
+                      {entry.provider} | {entry.model} | ****
+                      {entry.key.slice(-4)}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <AIToolsPanel
                 sessionId={session.id}
                 selectedIdea={selectedIdea}

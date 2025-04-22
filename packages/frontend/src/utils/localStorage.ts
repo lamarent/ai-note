@@ -85,6 +85,15 @@ export const getActiveEntryId = (): string | null => {
  */
 export const saveActiveEntryId = (id: string): void => {
   localStorage.setItem(STORAGE_KEYS.ACTIVE_ENTRY_ID, id);
+  window.dispatchEvent(new Event("activeEntryIdChanged"));
+};
+
+/**
+ * Remove active API entry ID from local storage
+ */
+export const removeActiveEntryId = (): void => {
+  localStorage.removeItem(STORAGE_KEYS.ACTIVE_ENTRY_ID);
+  window.dispatchEvent(new Event("activeEntryIdChanged"));
 };
 
 export const getApiKeyEntries = (): ApiKeyEntry[] => {
@@ -99,17 +108,20 @@ export const getApiKeyEntries = (): ApiKeyEntry[] => {
 
 export const saveApiKeyEntries = (entries: ApiKeyEntry[]): void => {
   localStorage.setItem(STORAGE_KEYS.API_KEY_ENTRIES, JSON.stringify(entries));
+  window.dispatchEvent(new Event("apiKeyEntriesChanged"));
 };
 
 export const addApiKeyEntry = (entry: ApiKeyEntry): void => {
   const entries = getApiKeyEntries();
   entries.push(entry);
   saveApiKeyEntries(entries);
+  window.dispatchEvent(new Event("apiKeyEntriesChanged"));
 };
 
 export const removeApiKeyEntry = (id: string): void => {
   const entries = getApiKeyEntries().filter((e) => e.id !== id);
   saveApiKeyEntries(entries);
+  window.dispatchEvent(new Event("apiKeyEntriesChanged"));
 };
 
 export const updateApiKeyEntry = (entry: ApiKeyEntry): void => {
@@ -117,6 +129,7 @@ export const updateApiKeyEntry = (entry: ApiKeyEntry): void => {
     e.id === entry.id ? entry : e
   );
   saveApiKeyEntries(entries);
+  window.dispatchEvent(new Event("apiKeyEntriesChanged"));
 };
 
 export default {
@@ -134,4 +147,5 @@ export default {
   updateApiKeyEntry,
   getActiveEntryId,
   saveActiveEntryId,
+  removeActiveEntryId,
 };

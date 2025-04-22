@@ -1,7 +1,7 @@
 import { apiConfig, ApiResponse } from "./config";
 import type { FetchOptions } from "./config";
 import { Idea } from "@ai-brainstorm/types";
-import { getApiKey, getProvider, getModel } from "../../utils/localStorage";
+import { getActiveEntryId, getApiKeyEntries } from "../../utils/localStorage";
 
 // AI API endpoint
 const AI_ENDPOINT = "/api/ai";
@@ -10,18 +10,21 @@ const AI_ENDPOINT = "/api/ai";
  * Helper to create headers with API key and AI settings
  */
 const getAuthHeaders = (): HeadersInit => {
-  const apiKey = getApiKey();
-  if (!apiKey) {
-    throw new Error("API key is required. Please set it in the settings page.");
+  const activeEntryId = getActiveEntryId();
+  const entries = getApiKeyEntries();
+  const entry = entries.find((e) => e.id === activeEntryId);
+  if (!entry) {
+    throw new Error(
+      "API key entry is required. Please select one in the settings page."
+    );
   }
+  const { key: apiKey, provider, model } = entry;
   const headers: Record<string, string> = {
     "X-API-Key": apiKey,
   };
-  const provider = getProvider();
   if (provider) {
     headers["X-AI-Provider"] = provider;
   }
-  const model = getModel();
   if (model) {
     headers["X-AI-Model"] = model;
   }

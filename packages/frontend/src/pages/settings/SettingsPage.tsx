@@ -3,6 +3,7 @@ import {
   getApiKeyEntries,
   getActiveEntryId,
   saveActiveEntryId,
+  removeActiveEntryId,
 } from "../../utils/localStorage";
 import type { ApiKeyEntry } from "../../types/apiKey";
 import ApiKeysTab from "./ApiKeysTab";
@@ -49,13 +50,24 @@ const SettingsPage: React.FC = () => {
                 </label>
                 <select
                   value={activeEntryId || ""}
-                  onFocus={() => setEntries(getApiKeyEntries())}
+                  onFocus={() => {
+                    const newEntries = getApiKeyEntries();
+                    setEntries(newEntries);
+                    const current = getActiveEntryId();
+                    if (!current || !newEntries.some((e) => e.id === current)) {
+                      removeActiveEntryId();
+                      setActiveEntryId(null);
+                    } else {
+                      setActiveEntryId(current);
+                    }
+                  }}
                   onChange={(e) => {
                     saveActiveEntryId(e.target.value);
                     setActiveEntryId(e.target.value);
                   }}
                   className="select select-bordered w-full"
                 >
+                  <option value="">-- Select Default API Key --</option>
                   {entries.map((entry) => (
                     <option key={entry.id} value={entry.id}>
                       {entry.provider} | {entry.model} | ****

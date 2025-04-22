@@ -5,6 +5,8 @@ import {
   addApiKeyEntry,
   removeApiKeyEntry,
   updateApiKeyEntry,
+  getActiveEntryId,
+  removeActiveEntryId,
 } from "../../utils/localStorage";
 
 const AI_PROVIDERS = [
@@ -112,6 +114,10 @@ const ApiKeysTab: React.FC = () => {
   const handleDeleteEntry = (id: string) => {
     removeApiKeyEntry(id);
     setEntries((prev) => prev.filter((en) => en.id !== id));
+    const currentActive = getActiveEntryId();
+    if (currentActive === id) {
+      removeActiveEntryId();
+    }
   };
 
   const cancelEdit = () => {
