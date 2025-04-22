@@ -1,7 +1,5 @@
 # AI Brainstorm
 
-[![CI](https://github.com/yourusername/ai-brainstorm/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/yourusername/ai-brainstorm/actions/workflows/ci.yml)
-
 An AI-powered brainstorming application that helps users generate, organize, and refine ideas.
 
 ## Overview
