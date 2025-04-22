@@ -35,6 +35,9 @@ jobs:
         run: pnpm install --frozen-lockfile
         working-directory: ./packages/backend
 
+      - name: Generate Prisma client
+        run: pnpm --filter @ai-brainstorm/database run generate
+
       - name: Build types package
         run: pnpm --filter @ai-brainstorm/types build
 
