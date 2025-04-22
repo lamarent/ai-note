@@ -130,6 +130,10 @@ const ApiKeysTab: React.FC = () => {
   return (
     <>
       <h2 className="card-title">API Key Entries</h2>
+      <p className="text-sm text-gray-500 mb-4">
+        Your API keys are stored only in your browser's local storage and are
+        never uploaded to any server.
+      </p>
       <ul>
         {entries.map((entry) => (
           <li

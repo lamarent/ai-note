@@ -11,6 +11,7 @@ const SessionDetailPage = React.lazy(
   () => import("./pages/sessions/SessionDetailPage")
 );
 const SettingsPage = React.lazy(() => import("./pages/settings/SettingsPage"));
+const RoadmapPage = React.lazy(() => import("./pages/roadmap/RoadmapPage"));
 
 // Fallback component while loading lazy-loaded pages
 // const LoadingFallback = () => (
@@ -42,6 +43,14 @@ const routes: RouteObject[] = [
     element: (
       <React.Suspense fallback={<LoadingFallback />}>
         <SessionDetailPage />
+      </React.Suspense>
+    ),
+  },
+  {
+    path: "/roadmap",
+    element: (
+      <React.Suspense fallback={<LoadingFallback />}>
+        <RoadmapPage />
       </React.Suspense>
     ),
   },

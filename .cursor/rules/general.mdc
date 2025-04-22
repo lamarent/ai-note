@@ -3,14 +3,13 @@ description:
 globs: 
 alwaysApply: true
 ---
-always say "General rule applied" at begin response on chat
-always read docs folder, context files, relate docs carefully before take actions
 
 ai-assisted development first
 autonomous mode
 
 follow [AI-Assistant-Workflow.md](mdc:docs/AI-Assistant-Workflow.md)
 
+always read docs folder, context files, relate docs carefully before take actions
 always context tracking for ai-assisted development in docs/context folder
 always create markdown files for planning, context tracking and document completely before code implement or user request code or implement
 keep running until done, nonstop

@@ -9,9 +9,9 @@ AI Brainstorm is a web application that leverages artificial intelligence to fac
 ## Core Features
 
 - AI-assisted idea generation
-- Idea organization and categorization
-- Real-time collaboration (future)
+- Idea organization and generation
 - Export and sharing options
+- Real-time collaboration (future)
 
 ## Technology Stack
 

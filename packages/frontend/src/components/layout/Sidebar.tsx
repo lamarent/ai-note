@@ -21,6 +21,11 @@ const Sidebar: React.FC = () => {
             Settings
           </Link>
         </li>
+        <li>
+          <Link to="/roadmap" className="menu-item">
+            Roadmap
+          </Link>
+        </li>
       </ul>
     </aside>
   );
