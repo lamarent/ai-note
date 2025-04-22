@@ -3,38 +3,19 @@ import { Link } from "react-router-dom";
 import Button from "../../components/common/Button";
 import Card from "../../components/common/Card";
 import Modal from "../../components/common/Modal";
-import Input from "../../components/forms/Input";
-import {
-  useGetSessions,
-  useCreateSession,
-  useDeleteSession,
-} from "../../hooks/useSessions";
+import NewSessionStepper from "../../components/sessions/NewSessionStepper";
+import { useGetSessions, useDeleteSession } from "../../hooks/useSessions";
 import { format } from "date-fns";
 
 const SessionsListPage: React.FC = () => {
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(
     null
   );
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    isPublic: true,
-  });
 
   // Fetch sessions using React Query
   const { data: sessions = [], isLoading, error, isError } = useGetSessions();
-
-  // Create session mutation
-  const createSession = useCreateSession({
-    onSuccess: () => {
-      console.log("createSession success");
-
-      setFormData({ title: "", description: "", isPublic: true });
-      setIsCreateModalOpen(false);
-    },
-  });
 
   // Delete session mutation
   const deleteSession = useDeleteSession({
@@ -43,28 +24,6 @@ const SessionsListPage: React.FC = () => {
       setIsDeleteModalOpen(false);
     },
   });
-
-  // Form handlers
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === "checkbox" ? checked : value,
-    });
-  };
-
-  const handleCreateSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Use a default owner ID for development/testing
-    // In a real app, this would come from auth
-    const ownerId = "00000000-0000-0000-0000-000000000000";
-
-    createSession.mutate({
-      ...formData,
-      ownerId,
-    });
-  };
 
   const handleDeleteClick = (id: string) => {
     setSelectedSessionId(id);
@@ -84,7 +43,7 @@ const SessionsListPage: React.FC = () => {
           <h1 className="text-3xl font-bold">Sessions</h1>
 
           <Button
-            onClick={() => setIsCreateModalOpen(true)}
+            onClick={() => setIsSidebarOpen(true)}
             leftIcon={
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -121,7 +80,7 @@ const SessionsListPage: React.FC = () => {
         {!isLoading && !isError && sessions.length === 0 && (
           <Card className="p-8 text-center">
             <p className="mb-4">No brainstorming sessions found.</p>
-            <Button onClick={() => setIsCreateModalOpen(true)}>
+            <Button onClick={() => setIsSidebarOpen(true)}>
               Create Your First Session
             </Button>
           </Card>
@@ -165,81 +124,24 @@ const SessionsListPage: React.FC = () => {
           ))}
         </div>
 
-        {/* Create Session Modal */}
-        <Modal
-          isOpen={isCreateModalOpen}
-          onClose={() => setIsCreateModalOpen(false)}
-          title="Create New Brainstorming Session"
-          footer={
-            <>
-              <Button
-                variant="secondary"
-                onClick={() => setIsCreateModalOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleCreateSubmit}
-                isLoading={createSession.isPending}
-                disabled={!formData.title}
-              >
-                Create
-              </Button>
-            </>
-          }
-        >
-          <form onSubmit={handleCreateSubmit} className="space-y-4">
-            <Input
-              label="Title"
-              name="title"
-              value={formData.title}
-              onChange={handleInputChange}
-              placeholder="Enter session title"
-              required
-            />
-
-            <div className="w-full">
-              <label
-                htmlFor="description"
-                className="block text-sm font-medium   mb-1"
-              >
-                Description
-              </label>
-              <textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
-                rows={3}
-                className="w-full rounded border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter session description"
-              />
-            </div>
-
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="isPublic"
-                name="isPublic"
-                checked={formData.isPublic}
-                onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label htmlFor="isPublic" className="ml-2 block text-sm  ">
-                Make this session public
-              </label>
-            </div>
-
-            {createSession.isError && (
-              <div className="text-red-600 text-sm">
-                {createSession.error?.message ||
-                  "An error occurred while creating the session"}
+        {/* Sidebar for Create Session */}
+        {isSidebarOpen && (
+          <div className="fixed inset-0 z-40 flex">
+            <div className="flex-1" onClick={() => setIsSidebarOpen(false)} />
+            <div className="w-full max-w-md bg-base-300 p-6 overflow-auto shadow-xl">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold">Create New Session</h2>
+                <button
+                  onClick={() => setIsSidebarOpen(false)}
+                  className="text-gray-600 hover:text-gray-900 text-2xl leading-none"
+                >
+                  ×
+                </button>
               </div>
-            )}
-          </form>
-        </Modal>
+              <NewSessionStepper />
+            </div>
+          </div>
+        )}
 
         {/* Delete Confirmation Modal */}
         <Modal

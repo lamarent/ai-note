@@ -3,8 +3,7 @@
  */
 
 // Base URL for API calls
-export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8787"; // Use /api suffix from constants.ts
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 // Default request timeout in milliseconds
 export const DEFAULT_TIMEOUT = 20000;
