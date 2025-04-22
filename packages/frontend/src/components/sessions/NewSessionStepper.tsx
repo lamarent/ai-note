@@ -107,7 +107,7 @@ const NewSessionStepper: React.FC = () => {
               <div className="text-center py-4">Loading ideas...</div>
             )}
             {!generateIdeas.isPending && generatedIdeas.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
                 {generatedIdeas.map((idea, idx) => (
                   <IdeaCard
                     key={idea.id}

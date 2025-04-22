@@ -128,7 +128,7 @@ const SessionsListPage: React.FC = () => {
         {isSidebarOpen && (
           <div className="fixed inset-0 z-40 flex">
             <div className="flex-1" onClick={() => setIsSidebarOpen(false)} />
-            <div className="w-full max-w-md bg-base-300 p-6 overflow-auto shadow-xl">
+            <div className="w-full max-w-1/2 bg-base-300 p-6 overflow-auto shadow-xl">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold">Create New Session</h2>
                 <button
